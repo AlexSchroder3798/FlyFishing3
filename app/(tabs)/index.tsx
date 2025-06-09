@@ -1,88 +1,88 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, MapPin, Thermometer, Droplets, Wind } from 'lucide-react-native';
 import LocationCard from '@/components/LocationCard';
 import WaterConditionsCard from '@/components/WaterConditionsCard';
 import HatchCalendarCard from '@/components/HatchCalendarCard';
 import { FishingLocation, WaterCondition, HatchEvent } from '@/types';
+import { getFishingLocations, getWaterConditions, getMockHatchEvents } from '@/lib/database';
 
 export default function ExploreTab() {
   const [locations, setLocations] = useState<FishingLocation[]>([]);
   const [waterConditions, setWaterConditions] = useState<WaterCondition[]>([]);
   const [hatchEvents, setHatchEvents] = useState<HatchEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadMockData();
+    loadData();
   }, []);
 
-  const loadMockData = () => {
-    // Mock data for demonstration
-    const mockLocations: FishingLocation[] = [
-      {
-        id: '1',
-        name: 'Ruby River',
-        latitude: 45.3311,
-        longitude: -112.5362,
-        type: 'river',
-        difficulty: 'intermediate',
-        species: ['Brown Trout', 'Rainbow Trout'],
-        access: 'public',
-        regulations: 'Artificial flies only, catch and release',
-        rating: 4.5,
-        reviewCount: 127
-      },
-      {
-        id: '2',
-        name: 'Madison River',
-        latitude: 44.6472,
-        longitude: -111.1045,
-        type: 'river',
-        difficulty: 'advanced',
-        species: ['Brown Trout', 'Rainbow Trout', 'Mountain Whitefish'],
-        access: 'public',
-        regulations: 'Standard regulations apply',
-        rating: 4.8,
-        reviewCount: 203
-      }
-    ];
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-    const mockConditions: WaterCondition[] = [
-      {
-        locationId: '1',
-        temperature: 52,
-        clarity: 'clear',
-        flow: 'normal',
-        level: 3.2,
-        lastUpdated: new Date()
-      },
-      {
-        locationId: '2',
-        temperature: 48,
-        clarity: 'slightly_stained',
-        flow: 'high',
-        level: 4.1,
-        lastUpdated: new Date()
-      }
-    ];
+      // Load data from Supabase
+      const [locationsData, conditionsData] = await Promise.all([
+        getFishingLocations(),
+        getWaterConditions()
+      ]);
 
-    const mockHatches: HatchEvent[] = [
-      {
-        id: '1',
-        insect: 'Blue Winged Olive',
-        region: 'Southwestern Montana',
-        startDate: new Date('2024-04-15'),
-        endDate: new Date('2024-05-30'),
-        peakTime: 'Late afternoon',
-        recommendedFlies: ['BWO Parachute #18', 'Pheasant Tail #16'],
-        notes: 'Best during overcast conditions'
-      }
-    ];
+      // Load mock hatch events (until we implement hatch events in database)
+      const hatchData = getMockHatchEvents();
 
-    setLocations(mockLocations);
-    setWaterConditions(mockConditions);
-    setHatchEvents(mockHatches);
+      setLocations(locationsData);
+      setWaterConditions(conditionsData);
+      setHatchEvents(hatchData);
+    } catch (err) {
+      console.error('Error loading explore data:', err);
+      setError('Failed to load data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleRefresh = () => {
+    loadData();
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Explore Waters</Text>
+          <TouchableOpacity style={styles.searchButton}>
+            <Search size={20} color="#6b7280" />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#2563eb" />
+          <Text style={styles.loadingText}>Loading fishing data...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Explore Waters</Text>
+          <TouchableOpacity style={styles.searchButton}>
+            <Search size={20} color="#6b7280" />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
+            <Text style={styles.retryButtonText}>Try Again</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -94,33 +94,46 @@ export default function ExploreTab() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Current Conditions</Text>
-          {waterConditions.map((condition) => {
-            const location = locations.find(l => l.id === condition.locationId);
-            return location ? (
-              <WaterConditionsCard
-                key={condition.locationId}
-                location={location}
-                condition={condition}
-              />
-            ) : null;
-          })}
-        </View>
+        {waterConditions.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Current Conditions</Text>
+            {waterConditions.map((condition) => {
+              const location = locations.find(l => l.id === condition.locationId);
+              return location ? (
+                <WaterConditionsCard
+                  key={condition.locationId}
+                  location={location}
+                  condition={condition}
+                />
+              ) : null;
+            })}
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Hatch Calendar</Text>
-          {hatchEvents.map((hatch) => (
-            <HatchCalendarCard key={hatch.id} hatch={hatch} />
-          ))}
-        </View>
+        {hatchEvents.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Hatch Calendar</Text>
+            {hatchEvents.map((hatch) => (
+              <HatchCalendarCard key={hatch.id} hatch={hatch} />
+            ))}
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Premium Locations</Text>
-          {locations.map((location) => (
-            <LocationCard key={location.id} location={location} />
-          ))}
-        </View>
+        {locations.length > 0 ? (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Premium Locations</Text>
+            {locations.map((location) => (
+              <LocationCard key={location.id} location={location} />
+            ))}
+          </View>
+        ) : (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateText}>No fishing locations found</Text>
+            <Text style={styles.emptyStateSubtext}>
+              Check back later or add some locations to get started
+            </Text>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -166,5 +179,57 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     color: '#1f2937',
     marginBottom: 12,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#6b7280',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#dc2626',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: '#2563eb',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#ffffff',
+  },
+  emptyState: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyStateText: {
+    fontSize: 18,
+    fontFamily: 'Inter-SemiBold',
+    color: '#4b5563',
+    marginBottom: 8,
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#6b7280',
+    textAlign: 'center',
   },
 });
