@@ -2,20 +2,23 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Play, Clock, BookOpen, Scissors } from 'lucide-react-native';
 
-interface EducationCardProps {
-  content: {
-    id: string;
-    title: string;
-    category: string;
-    type: string;
-    difficulty: string;
-    duration: string;
-    image: string;
-    description: string;
-  };
+interface EducationContent {
+  id: string;
+  title: string;
+  category: string;
+  type: string;
+  difficulty: string;
+  duration: string;
+  image: string;
+  description: string;
 }
 
-export default function EducationCard({ content }: EducationCardProps) {
+interface EducationCardProps {
+  content: EducationContent;
+  onPress: (content: EducationContent) => void;
+}
+
+export default function EducationCard({ content, onPress }: EducationCardProps) {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'beginner': return '#22c55e';
@@ -34,7 +37,7 @@ export default function EducationCard({ content }: EducationCardProps) {
   };
 
   return (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={() => onPress(content)}>
       <View style={styles.imageContainer}>
         <Image source={{ uri: content.image }} style={styles.image} />
         <View style={styles.typeOverlay}>
