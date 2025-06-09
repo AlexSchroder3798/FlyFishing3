@@ -1,11 +1,24 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Book, Video, Scissors, Knot, Fish, AlertCircle } from 'lucide-react-native';
 import EducationCard from '@/components/EducationCard';
 
+interface EducationContent {
+  id: string;
+  title: string;
+  category: string;
+  type: string;
+  difficulty: string;
+  duration: string;
+  image: string;
+  description: string;
+}
+
 export default function LearnTab() {
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const router = useRouter();
 
   const categories = [
     { id: 'all', name: 'All', icon: Book },
@@ -16,7 +29,7 @@ export default function LearnTab() {
     { id: 'regulations', name: 'Regulations', icon: AlertCircle },
   ];
 
-  const educationContent = [
+  const educationContent: EducationContent[] = [
     {
       id: '1',
       title: 'Woolly Bugger Fly Tying',
@@ -83,6 +96,10 @@ export default function LearnTab() {
     ? educationContent 
     : educationContent.filter(item => item.category === selectedCategory);
 
+  const handleEducationCardPress = (content: EducationContent) => {
+    router.push(`/learn/${content.id}`);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -123,7 +140,11 @@ export default function LearnTab() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
           {filteredContent.map((item) => (
-            <EducationCard key={item.id} content={item} />
+            <EducationCard 
+              key={item.id} 
+              content={item} 
+              onPress={handleEducationCardPress}
+            />
           ))}
         </View>
       </ScrollView>
