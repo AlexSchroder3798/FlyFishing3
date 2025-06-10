@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "router": {
-      "root": "app"
+      "root": "./app"
     },
     "ios": {
       "supportsTablet": true
@@ -20,7 +20,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      ["expo-router", {"root": "app"}], 
+      ["expo-router", {"root": "./app"}], 
       "expo-font", 
       "expo-web-browser"
     ],
