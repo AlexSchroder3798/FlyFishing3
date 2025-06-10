@@ -1,10 +1,17 @@
 import { supabase } from './supabase';
 import { FishingLocation, WaterCondition, HatchEvent, CatchRecord, FishingReport, Guide, User, Comment } from '@/types';
+import * as WebBrowser from 'expo-web-browser';
+import { makeRedirectUri } from 'expo-auth-session';
+import * as Crypto from 'expo-crypto';
+import { Platform } from 'react-native';
 
 /**
  * Database service layer for Supabase operations
  * Provides type-safe functions to interact with the fishing app database
  */
+
+// Complete the auth session for web browser
+WebBrowser.maybeCompleteAuthSession();
 
 // Fishing Locations
 export async function getFishingLocations(): Promise<FishingLocation[]> {
@@ -550,6 +557,166 @@ export async function signIn(email: string, password: string) {
   }
 }
 
+/**
+ * Sign in with Google using OAuth
+ * Handles both web and mobile platforms with appropriate redirect URIs
+ */
+export async function signInWithGoogle() {
+  try {
+    // Create a secure random state parameter for PKCE
+    const state = Crypto.randomUUID();
+    
+    // Generate redirect URI based on platform
+    const redirectUri = Platform.select({
+      web: `${window.location.origin}/auth/callback`,
+      default: makeRedirectUri({
+        scheme: 'flymaster',
+        path: 'auth/callback'
+      })
+    });
+
+    console.log('Google OAuth redirect URI:', redirectUri);
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectUri,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+          state: state
+        }
+      }
+    });
+
+    if (error) {
+      console.error('Error signing in with Google:', error);
+      throw new Error(error.message);
+    }
+
+    // For web, the redirect will happen automatically
+    // For mobile, we need to handle the browser session
+    if (Platform.OS !== 'web' && data.url) {
+      const result = await WebBrowser.openAuthSessionAsync(
+        data.url,
+        redirectUri,
+        {
+          showInRecents: true,
+        }
+      );
+
+      if (result.type === 'success') {
+        // Parse the URL to extract the session
+        const url = new URL(result.url);
+        const accessToken = url.searchParams.get('access_token');
+        const refreshToken = url.searchParams.get('refresh_token');
+        
+        if (accessToken) {
+          // Set the session manually for mobile
+          const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || ''
+          });
+
+          if (sessionError) {
+            throw new Error(sessionError.message);
+          }
+
+          return sessionData;
+        }
+      } else if (result.type === 'cancel') {
+        throw new Error('Authentication was cancelled');
+      } else {
+        throw new Error('Authentication failed');
+      }
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Auth error in signInWithGoogle:', error);
+    throw error;
+  }
+}
+
+/**
+ * Sign in with Apple using OAuth
+ * Available on iOS and web platforms
+ */
+export async function signInWithApple() {
+  try {
+    // Apple Sign-In is only available on iOS and web
+    if (Platform.OS === 'android') {
+      throw new Error('Apple Sign-In is not available on Android');
+    }
+
+    const state = Crypto.randomUUID();
+    
+    const redirectUri = Platform.select({
+      web: `${window.location.origin}/auth/callback`,
+      default: makeRedirectUri({
+        scheme: 'flymaster',
+        path: 'auth/callback'
+      })
+    });
+
+    console.log('Apple OAuth redirect URI:', redirectUri);
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'apple',
+      options: {
+        redirectTo: redirectUri,
+        queryParams: {
+          state: state
+        }
+      }
+    });
+
+    if (error) {
+      console.error('Error signing in with Apple:', error);
+      throw new Error(error.message);
+    }
+
+    // Handle mobile browser session
+    if (Platform.OS !== 'web' && data.url) {
+      const result = await WebBrowser.openAuthSessionAsync(
+        data.url,
+        redirectUri,
+        {
+          showInRecents: true,
+        }
+      );
+
+      if (result.type === 'success') {
+        const url = new URL(result.url);
+        const accessToken = url.searchParams.get('access_token');
+        const refreshToken = url.searchParams.get('refresh_token');
+        
+        if (accessToken) {
+          const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || ''
+          });
+
+          if (sessionError) {
+            throw new Error(sessionError.message);
+          }
+
+          return sessionData;
+        }
+      } else if (result.type === 'cancel') {
+        throw new Error('Authentication was cancelled');
+      } else {
+        throw new Error('Authentication failed');
+      }
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Auth error in signInWithApple:', error);
+    throw error;
+  }
+}
+
 export async function signOut() {
   try {
     const { error } = await supabase.auth.signOut();
@@ -562,4 +729,30 @@ export async function signOut() {
     console.error('Auth error in signOut:', error);
     throw error;
   }
+}
+
+/**
+ * Get the current authentication session
+ */
+export async function getSession() {
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.error('Error getting session:', error);
+      throw new Error(error.message);
+    }
+
+    return session;
+  } catch (error) {
+    console.error('Auth error in getSession:', error);
+    throw error;
+  }
+}
+
+/**
+ * Listen to authentication state changes
+ */
+export function onAuthStateChange(callback: (event: string, session: any) => void) {
+  return supabase.auth.onAuthStateChange(callback);
 }

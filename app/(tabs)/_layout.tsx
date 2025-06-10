@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
-import { Map, BookOpen, Users, Wrench, FileText } from 'lucide-react-native';
+import { Map, BookOpen, Users, Wrench, FileText, User } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -63,6 +63,15 @@ export default function TabLayout() {
           title: 'Tools',
           tabBarIcon: ({ size, color }) => (
             <Wrench size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ size, color }) => (
+            <User size={size} color={color} />
           ),
         }}
       />

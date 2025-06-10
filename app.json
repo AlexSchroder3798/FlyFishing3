@@ -1,18 +1,22 @@
 {
   "expo": {
-    "name": "bolt-expo-nativewind",
-    "slug": "bolt-expo-nativewind",
+    "name": "FlyMaster",
+    "slug": "flymaster-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "flymaster",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "router": {
       "root": "app"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.flymaster.app"
+    },
+    "android": {
+      "package": "com.flymaster.app"
     },
     "web": {
       "bundler": "metro",
