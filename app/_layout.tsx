@@ -7,8 +7,14 @@ export default function RootLayout() {
   return (
     <>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="+not-found" />
+        <Stack.Screen 
+          name="test" 
+          component={() => (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <Text>Test Screen Working!</Text>
+            </View>
+          )} 
+        />
       </Stack>
       <StatusBar style="auto" />
     </>
