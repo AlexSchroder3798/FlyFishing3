@@ -2,16 +2,28 @@ import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
-import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 // Explicit import to ensure react-native-svg is properly initialized for web
 import 'react-native-svg';
+
+declare const global: {
+  ErrorUtils?: {
+    setGlobalHandler: (handler: (err: any, isFatal?: boolean) => void) => void;
+  };
+} & typeof globalThis;
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   useFrameworkReady();
-  
+
   const [fontsLoaded, fontError] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-Medium': Inter_500Medium,
@@ -20,9 +32,16 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
+    global.ErrorUtils?.setGlobalHandler((error, isFatal) => {
+      console.error('Global Error:', error.message);
+      console.error(error.stack);
+    });
+  }, []);
+
+  useEffect(() => {
     // Add logging to diagnose font loading issues
     console.log('Font loading status:', { fontsLoaded, fontError });
-    
+
     if (fontsLoaded || fontError) {
       console.log('Hiding splash screen...');
       SplashScreen.hideAsync();
