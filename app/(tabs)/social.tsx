@@ -5,7 +5,7 @@ import { MessageCircle, Users, Star, TrendingUp, MapPin } from 'lucide-react-nat
 import ReportCard from '@/components/ReportCard';
 import GuideCard from '@/components/GuideCard';
 import { FishingReport, Guide } from '@/types';
-import { getFishingReports, getMockGuides } from '@/lib/database';
+import { getFishingReports, getGuides } from '@/lib/database';
 
 export default function SocialTab() {
   const [activeTab, setActiveTab] = useState<'reports' | 'guides' | 'groups'>('reports');
@@ -23,11 +23,11 @@ export default function SocialTab() {
       setLoading(true);
       setError(null);
 
-      // Load fishing reports from Supabase
-      const reportsData = await getFishingReports();
-      
-      // Load mock guides (until we implement guides in database)
-      const guidesData = getMockGuides();
+      // Load data from Supabase
+      const [reportsData, guidesData] = await Promise.all([
+        getFishingReports(),
+        getGuides()
+      ]);
 
       setReports(reportsData);
       setGuides(guidesData);
@@ -94,9 +94,19 @@ export default function SocialTab() {
         return (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Local Guides</Text>
-            {guides.map((guide) => (
-              <GuideCard key={guide.id} guide={guide} />
-            ))}
+            {guides.length > 0 ? (
+              guides.map((guide) => (
+                <GuideCard key={guide.id} guide={guide} />
+              ))
+            ) : (
+              <View style={styles.emptyState}>
+                <Star size={48} color="#9ca3af" />
+                <Text style={styles.emptyStateText}>No guides found</Text>
+                <Text style={styles.emptyStateSubtext}>
+                  Check back later for local fishing guides
+                </Text>
+              </View>
+            )}
           </View>
         );
       case 'groups':

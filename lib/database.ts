@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { FishingLocation, WaterCondition, CatchRecord, FishingReport, Comment, User, HatchEvent } from '@/types';
+import { FishingLocation, WaterCondition, CatchRecord, FishingReport, Comment, User, HatchEvent, Guide } from '@/types';
 
 /**
  * Database service layer for handling all Supabase operations
@@ -281,6 +281,171 @@ export async function createFishingReport(report: Omit<FishingReport, 'id' | 'cr
 }
 
 // ============================================================================
+// HATCH EVENTS
+// ============================================================================
+
+export async function getHatchEvents(): Promise<HatchEvent[]> {
+  try {
+    const { data, error } = await supabase
+      .from('hatch_events')
+      .select('*')
+      .order('start_date', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching hatch events:', error);
+      return [];
+    }
+
+    return (data || []).map(event => ({
+      ...event,
+      startDate: new Date(event.start_date),
+      endDate: new Date(event.end_date),
+      recommendedFlies: event.recommended_flies || []
+    }));
+  } catch (error) {
+    console.error('Unexpected error fetching hatch events:', error);
+    return [];
+  }
+}
+
+export async function getActiveHatchEvents(): Promise<HatchEvent[]> {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    
+    const { data, error } = await supabase
+      .from('hatch_events')
+      .select('*')
+      .lte('start_date', today)
+      .gte('end_date', today)
+      .order('start_date', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching active hatch events:', error);
+      return [];
+    }
+
+    return (data || []).map(event => ({
+      ...event,
+      startDate: new Date(event.start_date),
+      endDate: new Date(event.end_date),
+      recommendedFlies: event.recommended_flies || []
+    }));
+  } catch (error) {
+    console.error('Unexpected error fetching active hatch events:', error);
+    return [];
+  }
+}
+
+export async function createHatchEvent(event: Omit<HatchEvent, 'id' | 'created_at' | 'updated_at'>): Promise<HatchEvent | null> {
+  try {
+    const { data, error } = await supabase
+      .from('hatch_events')
+      .insert([{
+        ...event,
+        start_date: event.startDate.toISOString().split('T')[0],
+        end_date: event.endDate.toISOString().split('T')[0],
+        recommended_flies: event.recommendedFlies
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating hatch event:', error);
+      return null;
+    }
+
+    return {
+      ...data,
+      startDate: new Date(data.start_date),
+      endDate: new Date(data.end_date),
+      recommendedFlies: data.recommended_flies || []
+    };
+  } catch (error) {
+    console.error('Unexpected error creating hatch event:', error);
+    return null;
+  }
+}
+
+// ============================================================================
+// GUIDES
+// ============================================================================
+
+export async function getGuides(): Promise<Guide[]> {
+  try {
+    const { data, error } = await supabase
+      .from('guides')
+      .select('*')
+      .order('rating', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching guides:', error);
+      return [];
+    }
+
+    return (data || []).map(guide => ({
+      ...guide,
+      specialties: guide.specialties || [],
+      photos: guide.photos || []
+    }));
+  } catch (error) {
+    console.error('Unexpected error fetching guides:', error);
+    return [];
+  }
+}
+
+export async function getVerifiedGuides(): Promise<Guide[]> {
+  try {
+    const { data, error } = await supabase
+      .from('guides')
+      .select('*')
+      .eq('verified', true)
+      .order('rating', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching verified guides:', error);
+      return [];
+    }
+
+    return (data || []).map(guide => ({
+      ...guide,
+      specialties: guide.specialties || [],
+      photos: guide.photos || []
+    }));
+  } catch (error) {
+    console.error('Unexpected error fetching verified guides:', error);
+    return [];
+  }
+}
+
+export async function createGuide(guide: Omit<Guide, 'id' | 'created_at' | 'updated_at'>): Promise<Guide | null> {
+  try {
+    const { data, error } = await supabase
+      .from('guides')
+      .insert([{
+        ...guide,
+        price_range: guide.priceRange
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating guide:', error);
+      return null;
+    }
+
+    return {
+      ...data,
+      priceRange: data.price_range,
+      specialties: data.specialties || [],
+      photos: data.photos || []
+    };
+  } catch (error) {
+    console.error('Unexpected error creating guide:', error);
+    return null;
+  }
+}
+
+// ============================================================================
 // USERS
 // ============================================================================
 
@@ -399,10 +564,14 @@ export async function signOut() {
 }
 
 // ============================================================================
-// MOCK DATA FUNCTIONS (for features not yet in database)
+// DEPRECATED MOCK DATA FUNCTIONS (kept for backward compatibility)
 // ============================================================================
 
+/**
+ * @deprecated Use getHatchEvents() instead
+ */
 export function getMockHatchEvents(): HatchEvent[] {
+  console.warn('getMockHatchEvents is deprecated. Use getHatchEvents() instead.');
   return [
     {
       id: '1',
@@ -427,7 +596,11 @@ export function getMockHatchEvents(): HatchEvent[] {
   ];
 }
 
+/**
+ * @deprecated Use getGuides() instead
+ */
 export function getMockGuides() {
+  console.warn('getMockGuides is deprecated. Use getGuides() instead.');
   return [
     {
       id: '1',

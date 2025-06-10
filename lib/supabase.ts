@@ -269,6 +269,88 @@ export interface Database {
           updated_at?: string;
         };
       };
+      hatch_events: {
+        Row: {
+          id: string;
+          insect: string;
+          region: string;
+          start_date: string;
+          end_date: string;
+          peak_time: string;
+          recommended_flies: string[];
+          notes: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          insect: string;
+          region: string;
+          start_date: string;
+          end_date: string;
+          peak_time: string;
+          recommended_flies?: string[];
+          notes?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          insect?: string;
+          region?: string;
+          start_date?: string;
+          end_date?: string;
+          peak_time?: string;
+          recommended_flies?: string[];
+          notes?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      guides: {
+        Row: {
+          id: string;
+          name: string;
+          location: string;
+          rating: number;
+          specialties: string[];
+          price_range: string;
+          contact: string;
+          verified: boolean;
+          bio: string;
+          photos: string[];
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          location: string;
+          rating?: number;
+          specialties?: string[];
+          price_range?: string;
+          contact?: string;
+          verified?: boolean;
+          bio?: string;
+          photos?: string[];
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          location?: string;
+          rating?: number;
+          specialties?: string[];
+          price_range?: string;
+          contact?: string;
+          verified?: boolean;
+          bio?: string;
+          photos?: string[];
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
   };
 }
