@@ -79,7 +79,6 @@ export interface FishingReport {
 
 export interface Comment {
   id: string;
-  reportId: string;
   userId: string;
   username: string;
   content: string;

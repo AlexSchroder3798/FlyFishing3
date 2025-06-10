@@ -6,7 +6,7 @@ import LocationCard from '@/components/LocationCard';
 import WaterConditionsCard from '@/components/WaterConditionsCard';
 import HatchCalendarCard from '@/components/HatchCalendarCard';
 import { FishingLocation, WaterCondition, HatchEvent } from '@/types';
-import { getFishingLocations, getWaterConditions, getHatchEvents } from '@/lib/database';
+import { getFishingLocations, getWaterConditions, getHatchEvents } from '@/lib/mockData';
 
 export default function ExploreTab() {
   const [locations, setLocations] = useState<FishingLocation[]>([]);
@@ -24,7 +24,7 @@ export default function ExploreTab() {
       setLoading(true);
       setError(null);
 
-      // Load data from Supabase
+      // Load data from mock data service
       const [locationsData, conditionsData, hatchData] = await Promise.all([
         getFishingLocations(),
         getWaterConditions(),
