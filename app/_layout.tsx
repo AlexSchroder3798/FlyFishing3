@@ -20,17 +20,29 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
+    // Add logging to diagnose font loading issues
+    console.log('Font loading status:', { fontsLoaded, fontError });
+    
     if (fontsLoaded || fontError) {
+      console.log('Hiding splash screen...');
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
 
+  // Temporarily bypass font loading check to diagnose black screen
+  // Comment out the following lines to force app rendering
+  /*
   if (!fontsLoaded && !fontError) {
+    console.log('Fonts not loaded yet, showing splash screen');
     return null;
   }
+  */
+
+  // Add logging for successful render
+  console.log('Rendering main app layout');
 
   return (
-    <> 
+    <>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="+not-found" />
