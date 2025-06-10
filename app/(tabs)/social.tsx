@@ -5,7 +5,7 @@ import { MessageCircle, Users, Star, TrendingUp, MapPin } from 'lucide-react-nat
 import ReportCard from '@/components/ReportCard';
 import GuideCard from '@/components/GuideCard';
 import { FishingReport, Guide } from '@/types';
-import { getFishingReports, getGuides } from '@/lib/mockData';
+import { getFishingReports, getGuides } from '@/lib/database';
 
 export default function SocialTab() {
   const [activeTab, setActiveTab] = useState<'reports' | 'guides' | 'groups'>('reports');
@@ -23,7 +23,7 @@ export default function SocialTab() {
       setLoading(true);
       setError(null);
 
-      // Load data from mock data service
+      // Load data from Supabase
       const [reportsData, guidesData] = await Promise.all([
         getFishingReports(),
         getGuides()
