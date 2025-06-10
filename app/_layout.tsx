@@ -11,7 +11,7 @@ import {
 } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 // Explicit import to ensure react-native-svg is properly initialized for web
-import 'react-native-svg';
+
 
 declare const global: {
   ErrorUtils?: {
