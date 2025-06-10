@@ -8,17 +8,6 @@ import HatchCalendarCard from '@/components/HatchCalendarCard';
 import { FishingLocation, WaterCondition, HatchEvent } from '@/types';
 import { getFishingLocations, getWaterConditions, getHatchEvents } from '@/lib/database';
 
-
-import { View, Text } from 'react-native';
-
-export default function Home() {
-  return (
-    <View>
-      <Text>Hello from Index</Text>
-    </View>
-  );
-}
-
 export default function ExploreTab() {
   const [locations, setLocations] = useState<FishingLocation[]>([]);
   const [waterConditions, setWaterConditions] = useState<WaterCondition[]>([]);
