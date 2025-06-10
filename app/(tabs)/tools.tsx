@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CloudRain, Thermometer, Wind, Gauge, Moon, Sun } from 'lucide-react-native';
+import { CloudRain, Thermometer, Wind, Gauge, Database } from 'lucide-react-native';
 import WeatherCard from '@/components/WeatherCard';
 import SolunarCard from '@/components/SolunarCard';
 import StreamFlowCard from '@/components/StreamFlowCard';
-import { WeatherCondition } from '@/types';
+import { WeatherCondition, User } from '@/types';
+import { getCurrentUser } from '@/lib/database';
+import { populateDatabase } from '@/scripts/populate-db';
 
 export default function ToolsTab() {
   const [weather, setWeather] = useState<WeatherCondition | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isPopulating, setIsPopulating] = useState(false);
   const [solunarData, setSolunarData] = useState({
     majorPeriods: ['6:15 AM - 8:15 AM', '6:45 PM - 8:45 PM'],
     minorPeriods: ['12:30 PM - 1:30 PM', '12:45 AM - 1:45 AM'],
@@ -18,10 +22,11 @@ export default function ToolsTab() {
 
   useEffect(() => {
     loadWeatherData();
+    loadCurrentUser();
   }, []);
 
   const loadWeatherData = () => {
-    // Mock weather data
+    // Mock weather data - in production this would come from a weather API
     const mockWeather: WeatherCondition = {
       temperature: 62,
       humidity: 68,
@@ -33,6 +38,59 @@ export default function ToolsTab() {
     };
     
     setWeather(mockWeather);
+  };
+
+  const loadCurrentUser = async () => {
+    try {
+      const user = await getCurrentUser();
+      setCurrentUser(user);
+    } catch (error) {
+      console.error('Error loading current user:', error);
+    }
+  };
+
+  const handlePopulateDb = async () => {
+    if (!currentUser) {
+      Alert.alert(
+        'Authentication Required',
+        'Please sign in to populate the database with user-specific data.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    Alert.alert(
+      'Populate Database',
+      'This will add sample fishing data to your database. This action cannot be undone. Continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Populate',
+          style: 'destructive',
+          onPress: async () => {
+            setIsPopulating(true);
+            try {
+              console.log('🎣 Starting database population...');
+              await populateDatabase(currentUser.id);
+              Alert.alert(
+                'Success!',
+                'Database has been populated with sample data. You may need to refresh other tabs to see the changes.',
+                [{ text: 'OK' }]
+              );
+            } catch (error) {
+              console.error('Error populating database:', error);
+              Alert.alert(
+                'Error',
+                'Failed to populate database. Please check the console for details.',
+                [{ text: 'OK' }]
+              );
+            } finally {
+              setIsPopulating(false);
+            }
+          }
+        }
+      ]
+    );
   };
 
   const tools = [
@@ -79,10 +137,12 @@ export default function ToolsTab() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Current Weather</Text>
-          {weather && <WeatherCard weather={weather} />}
-        </View>
+        {weather && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Current Weather</Text>
+            <WeatherCard weather={weather} />
+          </View>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Conditions Analysis</Text>
@@ -131,6 +191,36 @@ export default function ToolsTab() {
             ))}
           </View>
         </View>
+
+        {__DEV__ && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Developer Tools</Text>
+            <View style={styles.devCard}>
+              <View style={styles.devHeader}>
+                <Database size={20} color="#2563eb" />
+                <Text style={styles.devTitle}>Database Population</Text>
+              </View>
+              <Text style={styles.devDescription}>
+                Populate your database with realistic sample data including fishing locations, 
+                water conditions, hatch events, guides, catch records, and reports.
+              </Text>
+              <TouchableOpacity 
+                style={[styles.devButton, isPopulating && styles.devButtonDisabled]} 
+                onPress={handlePopulateDb}
+                disabled={isPopulating}
+              >
+                <Text style={styles.devButtonText}>
+                  {isPopulating ? 'Populating Database...' : 'Populate Database with Sample Data'}
+                </Text>
+              </TouchableOpacity>
+              {!currentUser && (
+                <Text style={styles.devWarning}>
+                  ⚠️ Sign in required for user-specific data (catches, reports, comments)
+                </Text>
+              )}
+            </View>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -247,5 +337,51 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#6b7280',
     lineHeight: 16,
+  },
+  devCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+  },
+  devHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  devTitle: {
+    marginLeft: 8,
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#1f2937',
+  },
+  devDescription: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#6b7280',
+    lineHeight: 16,
+    marginBottom: 16,
+  },
+  devButton: {
+    backgroundColor: '#2563eb',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  devButtonDisabled: {
+    backgroundColor: '#9ca3af',
+  },
+  devButtonText: {
+    color: '#ffffff',
+    fontFamily: 'Inter-SemiBold',
+    fontSize: 14,
+  },
+  devWarning: {
+    fontSize: 11,
+    fontFamily: 'Inter-Regular',
+    color: '#f59e0b',
+    marginTop: 8,
+    textAlign: 'center',
   },
 });

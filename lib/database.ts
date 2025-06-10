@@ -389,6 +389,56 @@ export async function createFishingReport(
 }
 
 // ============================================================================
+// COMMENTS
+// ============================================================================
+
+/**
+ * Creates a new comment
+ * @param comment - The comment data to create
+ * @returns Promise<Comment | null> The created comment or null if failed
+ */
+export async function createComment(
+  comment: Omit<Comment, 'id' | 'username'>
+): Promise<Comment | null> {
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .insert([{
+        report_id: comment.reportId,
+        user_id: comment.userId,
+        content: comment.content,
+        timestamp: comment.timestamp.toISOString()
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating comment:', error);
+      return null;
+    }
+
+    // Fetch username for the created comment
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('username')
+      .eq('id', data.user_id)
+      .single();
+
+    return {
+      id: data.id,
+      reportId: data.report_id,
+      userId: data.user_id,
+      content: data.content,
+      timestamp: new Date(data.timestamp),
+      username: userData?.username || 'Anonymous'
+    };
+  } catch (error) {
+    console.error('Unexpected error creating comment:', error);
+    return null;
+  }
+}
+
+// ============================================================================
 // HATCH EVENTS
 // ============================================================================
 
