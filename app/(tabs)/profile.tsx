@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Settings, LogOut, Edit3, MapPin, Calendar, Fish, Trophy } from 'lucide-react-native';
+import { User, Settings, LogOut, CreditCard as Edit3, MapPin, Calendar, Fish, Trophy } from 'lucide-react-native';
 import { getCurrentUser, signOut, getSession, onAuthStateChange } from '@/lib/database';
 import { User as UserType } from '@/types';
 import AuthButton from '@/components/AuthButton';

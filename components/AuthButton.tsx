@@ -52,7 +52,7 @@ export default function AuthButton({ onSuccess, onError }: AuthButtonProps) {
         disabled={isLoading}
       >
         {loadingProvider === 'google' ? (
-          <ActivityIndicator size="small" color="#ffffff" />
+          <ActivityIndicator size="small\" color="#ffffff" />
         ) : (
           <Mail size={20} color="#ffffff" />
         )}
@@ -68,7 +68,7 @@ export default function AuthButton({ onSuccess, onError }: AuthButtonProps) {
           disabled={isLoading}
         >
           {loadingProvider === 'apple' ? (
-            <ActivityIndicator size="small" color="#ffffff" />
+            <ActivityIndicator size="small\" color="#ffffff" />
           ) : (
             <LogIn size={20} color="#ffffff" />
           )}
