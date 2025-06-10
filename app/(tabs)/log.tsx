@@ -5,7 +5,7 @@ import { Plus, Calendar, Fish, TrendingUp } from 'lucide-react-native';
 import CatchCard from '@/components/CatchCard';
 import StatsCard from '@/components/StatsCard';
 import { CatchRecord } from '@/types';
-import { getCatchRecords, getCurrentUser } from '@/lib/mockData';
+import { getCatchRecords, getCurrentUser } from '@/lib/database';
 
 export default function LogTab() {
   const [catches, setCatches] = useState<CatchRecord[]>([]);
@@ -30,7 +30,7 @@ export default function LogTab() {
       // Get current user to filter catches
       const user = await getCurrentUser();
       
-      // Load catch records from mock data
+      // Load catch records from Supabase
       const catchData = user ? await getCatchRecords(user.id) : [];
       
       setCatches(catchData);
