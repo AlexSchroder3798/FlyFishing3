@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  Platform,
+} from 'react-native';
 import { LogIn, Mail } from 'lucide-react-native';
 import { signInWithGoogle, signInWithApple } from '@/lib/database';
 
@@ -10,18 +17,24 @@ interface AuthButtonProps {
 
 export default function AuthButton({ onSuccess, onError }: AuthButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingProvider, setLoadingProvider] = useState<'google' | 'apple' | null>(null);
+  const [loadingProvider, setLoadingProvider] = useState<
+    'google' | 'apple' | null
+  >(null);
 
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
       setLoadingProvider('google');
-      
+
       await signInWithGoogle();
       onSuccess?.();
     } catch (error) {
       console.error('Google sign-in error:', error);
-      onError?.(error instanceof Error ? error.message : 'Failed to sign in with Google');
+      onError?.(
+        error instanceof Error
+          ? error.message
+          : 'Failed to sign in with Google',
+      );
     } finally {
       setIsLoading(false);
       setLoadingProvider(null);
@@ -32,12 +45,14 @@ export default function AuthButton({ onSuccess, onError }: AuthButtonProps) {
     try {
       setIsLoading(true);
       setLoadingProvider('apple');
-      
+
       await signInWithApple();
       onSuccess?.();
     } catch (error) {
       console.error('Apple sign-in error:', error);
-      onError?.(error instanceof Error ? error.message : 'Failed to sign in with Apple');
+      onError?.(
+        error instanceof Error ? error.message : 'Failed to sign in with Apple',
+      );
     } finally {
       setIsLoading(false);
       setLoadingProvider(null);
@@ -52,12 +67,14 @@ export default function AuthButton({ onSuccess, onError }: AuthButtonProps) {
         disabled={isLoading}
       >
         {loadingProvider === 'google' ? (
-          <ActivityIndicator size="small\" color="#ffffff" />
+          <ActivityIndicator size="small" color="#ffffff" />
         ) : (
           <Mail size={20} color="#ffffff" />
         )}
         <Text style={[styles.buttonText, styles.googleButtonText]}>
-          {loadingProvider === 'google' ? 'Signing in...' : 'Continue with Google'}
+          {loadingProvider === 'google'
+            ? 'Signing in...'
+            : 'Continue with Google'}
         </Text>
       </TouchableOpacity>
 
@@ -68,12 +85,14 @@ export default function AuthButton({ onSuccess, onError }: AuthButtonProps) {
           disabled={isLoading}
         >
           {loadingProvider === 'apple' ? (
-            <ActivityIndicator size="small\" color="#ffffff" />
+            <ActivityIndicator size="small" color="#ffffff" />
           ) : (
             <LogIn size={20} color="#ffffff" />
           )}
           <Text style={[styles.buttonText, styles.appleButtonText]}>
-            {loadingProvider === 'apple' ? 'Signing in...' : 'Continue with Apple'}
+            {loadingProvider === 'apple'
+              ? 'Signing in...'
+              : 'Continue with Apple'}
           </Text>
         </TouchableOpacity>
       )}
