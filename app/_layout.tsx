@@ -38,9 +38,14 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    // Force hide splash screen immediately
-    SplashScreen.hideAsync();
-  }, []);
+    // Add logging to diagnose font loading issues
+    console.log('Font loading status:', { fontsLoaded, fontError });
+
+    if (fontsLoaded || fontError) {
+      console.log('Hiding splash screen...');
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
 
   // Temporarily bypass font loading check to diagnose black screen
   // Comment out the following lines to force app rendering
