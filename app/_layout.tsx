@@ -29,20 +29,13 @@ export default function RootLayout() {
     return null;
   }
 
-  //return (
-    
-    //<>
-    //  <Stack screenOptions={{ headerShown: false }}>
-    //    <Stack.Screen name="(tabs)" />
-    //    <Stack.Screen name="+not-found" />
-     // </Stack>
-    //  <StatusBar style="auto" />
-   // </>
-  //);
   return (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>Hello from RootLayout!</Text>
-  </View>
-);
-
+    <> 
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar style="auto" />
+    </>
+  );
 }
