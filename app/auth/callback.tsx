@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 
 export default function AuthCallback() {
   const router = useRouter();
-  const params = useLocalSearchParams();
+  const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
     handleAuthCallback();
@@ -13,37 +13,62 @@ export default function AuthCallback() {
 
   const handleAuthCallback = async () => {
     try {
-      // Extract tokens from URL parameters
-      const { access_token, refresh_token, error, error_description } = params;
+      // Wait a brief moment for the Root Layout to fully mount
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Check if we have a session after the OAuth redirect
+      const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {
-        console.error('Auth callback error:', error, error_description);
-        router.replace('/(tabs)/profile?error=' + encodeURIComponent(error_description || error));
+        console.error('Session error:', error);
+        setTimeout(() => {
+          router.replace('/(tabs)/profile?error=' + encodeURIComponent(error.message));
+        }, 100);
         return;
       }
 
-      if (access_token && refresh_token) {
-        // Set the session with the tokens
-        const { data, error: sessionError } = await supabase.auth.setSession({
-          access_token: access_token as string,
-          refresh_token: refresh_token as string,
-        });
-
-        if (sessionError) {
-          console.error('Session error:', sessionError);
-          router.replace('/(tabs)/profile?error=' + encodeURIComponent(sessionError.message));
-          return;
-        }
-
-        console.log('Auth successful:', data.user?.email);
-        router.replace('/(tabs)/profile');
+      if (session?.user) {
+        console.log('Auth successful:', session.user.email);
+        setTimeout(() => {
+          router.replace('/(tabs)/profile');
+        }, 100);
       } else {
-        console.error('Missing tokens in callback');
-        router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication failed'));
+        // Listen for auth state changes in case the session is still being processed
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            if (event === 'SIGNED_IN' && session?.user) {
+              console.log('Auth successful via state change:', session.user.email);
+              subscription.unsubscribe();
+              setTimeout(() => {
+                router.replace('/(tabs)/profile');
+              }, 100);
+            } else if (event === 'SIGNED_OUT' || (event === 'TOKEN_REFRESHED' && !session)) {
+              subscription.unsubscribe();
+              setTimeout(() => {
+                router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication failed'));
+              }, 100);
+            }
+          }
+        );
+
+        // If no session after a reasonable timeout, consider it failed
+        setTimeout(() => {
+          subscription.unsubscribe();
+          if (isProcessing) {
+            setIsProcessing(false);
+            setTimeout(() => {
+              router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication timeout'));
+            }, 100);
+          }
+        }, 5000);
       }
     } catch (error) {
       console.error('Auth callback error:', error);
-      router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication failed'));
+      setTimeout(() => {
+        router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication failed'));
+      }, 100);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
