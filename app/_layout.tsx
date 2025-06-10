@@ -19,6 +19,12 @@ declare const global: {
   };
 } & typeof globalThis;
 
+// Register a global error handler immediately so even early errors are logged
+global.ErrorUtils?.setGlobalHandler((error, isFatal) => {
+  console.error('Global Error:', error.message);
+  console.error(error.stack);
+});
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -30,13 +36,6 @@ export default function RootLayout() {
     'Inter-SemiBold': Inter_600SemiBold,
     'Inter-Bold': Inter_700Bold,
   });
-
-  useEffect(() => {
-    global.ErrorUtils?.setGlobalHandler((error, isFatal) => {
-      console.error('Global Error:', error.message);
-      console.error(error.stack);
-    });
-  }, []);
 
   useEffect(() => {
     // Add logging to diagnose font loading issues
