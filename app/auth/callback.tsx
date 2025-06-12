@@ -8,19 +8,29 @@ export default function AuthCallback() {
   const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
-  const hash = window.location.hash;
-  console.log("Current location.hash:", hash);
+  console.log("Current location.hash:", window.location.hash);
 
-  if (hash.includes("access_token")) {
-    console.log("Processing URL hash...");
-    supabase.auth._processUrlHash(hash).then(() => {
-      console.log("Supabase processed URL hash.");
-      handleAuthCallback();
-    });
-  } else {
-    handleAuthCallback();
-  }
+  const handle = async () => {
+    const { data: { session }, error } = await supabase.auth.getSession();
+
+    if (error) {
+      console.error('Session error:', error);
+      router.replace('/(tabs)/profile?error=' + encodeURIComponent(error.message));
+      return;
+    }
+
+    if (session?.user) {
+      console.log('Auth successful via existing session:', session.user.email);
+      router.replace('/(tabs)/profile');
+    } else {
+      console.error('No session found');
+      router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication timeout'));
+    }
+  };
+
+  handle();
 }, []);
+
 
 
   const handleAuthCallback = async () => {
