@@ -49,15 +49,17 @@ export default function ExploreTab() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Explore Waters</Text>
-          <TouchableOpacity style={styles.searchButton}>
-            <Search size={20} color="#6b7280" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#2563eb" />
-          <Text style={styles.loadingText}>Loading fishing data...</Text>
+        <View style={styles.webContainer}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Explore Waters</Text>
+            <TouchableOpacity style={styles.searchButton}>
+              <Search size={20} color="#6b7280" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#2563eb" />
+            <Text style={styles.loadingText}>Loading fishing data...</Text>
+          </View>
         </View>
       </SafeAreaView>
     );
@@ -66,17 +68,19 @@ export default function ExploreTab() {
   if (error) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Explore Waters</Text>
-          <TouchableOpacity style={styles.searchButton}>
-            <Search size={20} color="#6b7280" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
-            <Text style={styles.retryButtonText}>Try Again</Text>
-          </TouchableOpacity>
+        <View style={styles.webContainer}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Explore Waters</Text>
+            <TouchableOpacity style={styles.searchButton}>
+              <Search size={20} color="#6b7280" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
+              <Text style={styles.retryButtonText}>Try Again</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </SafeAreaView>
     );
@@ -84,55 +88,68 @@ export default function ExploreTab() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Explore Waters</Text>
-        <TouchableOpacity style={styles.searchButton}>
-          <Search size={20} color="#6b7280" />
-        </TouchableOpacity>
+      <View style={styles.webContainer}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Explore Waters</Text>
+          <TouchableOpacity style={styles.searchButton}>
+            <Search size={20} color="#6b7280" />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {waterConditions.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Current Conditions</Text>
+              <View style={styles.cardsGrid}>
+                {waterConditions.map((condition) => {
+                  const location = locations.find(l => l.id === condition.locationId);
+                  return location ? (
+                    <View key={condition.locationId} style={styles.cardWrapper}>
+                      <WaterConditionsCard
+                        location={location}
+                        condition={condition}
+                      />
+                    </View>
+                  ) : null;
+                })}
+              </View>
+            </View>
+          )}
+
+          {hatchEvents.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Hatch Calendar</Text>
+              <View style={styles.cardsGrid}>
+                {hatchEvents.map((hatch) => (
+                  <View key={hatch.id} style={styles.cardWrapper}>
+                    <HatchCalendarCard hatch={hatch} />
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {locations.length > 0 ? (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Premium Locations</Text>
+              <View style={styles.cardsGrid}>
+                {locations.map((location) => (
+                  <View key={location.id} style={styles.cardWrapper}>
+                    <LocationCard location={location} />
+                  </View>
+                ))}
+              </View>
+            </View>
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateText}>No fishing locations found</Text>
+              <Text style={styles.emptyStateSubtext}>
+                Check back later or add some locations to get started
+              </Text>
+            </View>
+          )}
+        </ScrollView>
       </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {waterConditions.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Current Conditions</Text>
-            {waterConditions.map((condition) => {
-              const location = locations.find(l => l.id === condition.locationId);
-              return location ? (
-                <WaterConditionsCard
-                  key={condition.locationId}
-                  location={location}
-                  condition={condition}
-                />
-              ) : null;
-            })}
-          </View>
-        )}
-
-        {hatchEvents.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Hatch Calendar</Text>
-            {hatchEvents.map((hatch) => (
-              <HatchCalendarCard key={hatch.id} hatch={hatch} />
-            ))}
-          </View>
-        )}
-
-        {locations.length > 0 ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Premium Locations</Text>
-            {locations.map((location) => (
-              <LocationCard key={location.id} location={location} />
-            ))}
-          </View>
-        ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No fishing locations found</Text>
-            <Text style={styles.emptyStateSubtext}>
-              Check back later or add some locations to get started
-            </Text>
-          </View>
-        )}
-      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -141,6 +158,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8fafc',
+  },
+  webContainer: {
+    flex: 1,
+    ...Platform.select({
+      web: {
+        maxWidth: 1200,
+        alignSelf: 'center',
+        width: '100%',
+      },
+      default: {},
+    }),
   },
   header: {
     flexDirection: 'row',
@@ -151,6 +179,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb',
+    ...Platform.select({
+      web: {
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderLeftColor: '#e5e7eb',
+        borderRightColor: '#e5e7eb',
+      },
+      default: {},
+    }),
   },
   title: {
     fontSize: 24,
@@ -168,15 +205,48 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
+    ...Platform.select({
+      web: {
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderLeftColor: '#e5e7eb',
+        borderRightColor: '#e5e7eb',
+      },
+      default: {},
+    }),
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 32,
   },
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
     color: '#1f2937',
-    marginBottom: 12,
+    marginBottom: 16,
+  },
+  cardsGrid: {
+    ...Platform.select({
+      web: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginHorizontal: -8,
+      },
+      default: {
+        flexDirection: 'column',
+      },
+    }),
+  },
+  cardWrapper: {
+    ...Platform.select({
+      web: {
+        width: '50%',
+        paddingHorizontal: 8,
+        marginBottom: 16,
+      },
+      default: {
+        width: '100%',
+      },
+    }),
   },
   loadingContainer: {
     flex: 1,

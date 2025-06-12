@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MessageCircle, Users, Star, TrendingUp, MapPin } from 'lucide-react-native';
 import ReportCard from '@/components/ReportCard';
@@ -75,38 +75,46 @@ export default function SocialTab() {
         return (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Recent Fishing Reports</Text>
-            {reports.length > 0 ? (
-              reports.map((report) => (
-                <ReportCard key={report.id} report={report} />
-              ))
-            ) : (
-              <View style={styles.emptyState}>
-                <TrendingUp size={48} color="#9ca3af" />
-                <Text style={styles.emptyStateText}>No reports yet</Text>
-                <Text style={styles.emptyStateSubtext}>
-                  Be the first to share a fishing report with the community
-                </Text>
-              </View>
-            )}
+            <View style={styles.cardsGrid}>
+              {reports.length > 0 ? (
+                reports.map((report) => (
+                  <View key={report.id} style={styles.cardWrapper}>
+                    <ReportCard report={report} />
+                  </View>
+                ))
+              ) : (
+                <View style={styles.emptyState}>
+                  <TrendingUp size={48} color="#9ca3af" />
+                  <Text style={styles.emptyStateText}>No reports yet</Text>
+                  <Text style={styles.emptyStateSubtext}>
+                    Be the first to share a fishing report with the community
+                  </Text>
+                </View>
+              )}
+            </View>
           </View>
         );
       case 'guides':
         return (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Local Guides</Text>
-            {guides.length > 0 ? (
-              guides.map((guide) => (
-                <GuideCard key={guide.id} guide={guide} />
-              ))
-            ) : (
-              <View style={styles.emptyState}>
-                <Star size={48} color="#9ca3af" />
-                <Text style={styles.emptyStateText}>No guides found</Text>
-                <Text style={styles.emptyStateSubtext}>
-                  Check back later for local fishing guides
-                </Text>
-              </View>
-            )}
+            <View style={styles.cardsGrid}>
+              {guides.length > 0 ? (
+                guides.map((guide) => (
+                  <View key={guide.id} style={styles.cardWrapper}>
+                    <GuideCard guide={guide} />
+                  </View>
+                ))
+              ) : (
+                <View style={styles.emptyState}>
+                  <Star size={48} color="#9ca3af" />
+                  <Text style={styles.emptyStateText}>No guides found</Text>
+                  <Text style={styles.emptyStateSubtext}>
+                    Check back later for local fishing guides
+                  </Text>
+                </View>
+              )}
+            </View>
           </View>
         );
       case 'groups':
@@ -129,42 +137,44 @@ export default function SocialTab() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Community</Text>
-        <TouchableOpacity style={styles.messageButton}>
-          <MessageCircle size={20} color="#6b7280" />
-        </TouchableOpacity>
-      </View>
+      <View style={styles.webContainer}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Community</Text>
+          <TouchableOpacity style={styles.messageButton}>
+            <MessageCircle size={20} color="#6b7280" />
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.tabsContainer}>
-        {tabs.map((tab) => {
-          const IconComponent = tab.icon;
-          const isActive = activeTab === tab.id;
-          
-          return (
-            <TouchableOpacity
-              key={tab.id}
-              style={[styles.tab, isActive && styles.activeTab]}
-              onPress={() => setActiveTab(tab.id as any)}
-            >
-              <IconComponent 
-                size={18} 
-                color={isActive ? '#2563eb' : '#6b7280'} 
-              />
-              <Text style={[
-                styles.tabText,
-                isActive && styles.activeTabText
-              ]}>
-                {tab.name}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+        <View style={styles.tabsContainer}>
+          {tabs.map((tab) => {
+            const IconComponent = tab.icon;
+            const isActive = activeTab === tab.id;
+            
+            return (
+              <TouchableOpacity
+                key={tab.id}
+                style={[styles.tab, isActive && styles.activeTab]}
+                onPress={() => setActiveTab(tab.id as any)}
+              >
+                <IconComponent 
+                  size={18} 
+                  color={isActive ? '#2563eb' : '#6b7280'} 
+                />
+                <Text style={[
+                  styles.tabText,
+                  isActive && styles.activeTabText
+                ]}>
+                  {tab.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {renderContent()}
-      </ScrollView>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {renderContent()}
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -173,6 +183,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8fafc',
+  },
+  webContainer: {
+    flex: 1,
+    ...Platform.select({
+      web: {
+        maxWidth: 1200,
+        alignSelf: 'center',
+        width: '100%',
+      },
+      default: {},
+    }),
   },
   header: {
     flexDirection: 'row',
@@ -183,6 +204,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb',
+    ...Platform.select({
+      web: {
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderLeftColor: '#e5e7eb',
+        borderRightColor: '#e5e7eb',
+      },
+      default: {},
+    }),
   },
   title: {
     fontSize: 24,
@@ -202,6 +232,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb',
+    ...Platform.select({
+      web: {
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderLeftColor: '#e5e7eb',
+        borderRightColor: '#e5e7eb',
+      },
+      default: {},
+    }),
   },
   tab: {
     flex: 1,
@@ -227,6 +266,15 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
+    ...Platform.select({
+      web: {
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderLeftColor: '#e5e7eb',
+        borderRightColor: '#e5e7eb',
+      },
+      default: {},
+    }),
   },
   section: {
     marginBottom: 24,
@@ -235,7 +283,31 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
     color: '#1f2937',
-    marginBottom: 12,
+    marginBottom: 16,
+  },
+  cardsGrid: {
+    ...Platform.select({
+      web: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginHorizontal: -8,
+      },
+      default: {
+        flexDirection: 'column',
+      },
+    }),
+  },
+  cardWrapper: {
+    ...Platform.select({
+      web: {
+        width: '50%',
+        paddingHorizontal: 8,
+        marginBottom: 16,
+      },
+      default: {
+        width: '100%',
+      },
+    }),
   },
   loadingContainer: {
     flex: 1,
@@ -280,6 +352,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#e5e7eb',
+    ...Platform.select({
+      web: {
+        width: '100%',
+      },
+      default: {},
+    }),
   },
   emptyStateText: {
     fontSize: 18,

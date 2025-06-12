@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Book, Video, Scissors, Banknote as Knot, Fish, CircleAlert as AlertCircle } from 'lucide-react-native';
@@ -102,52 +102,57 @@ export default function LearnTab() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Learn & Improve</Text>
-      </View>
-
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        style={styles.categoriesScroll}
-        contentContainerStyle={styles.categoriesContainer}
-      >
-        {categories.map((category) => {
-          const IconComponent = category.icon;
-          const isSelected = selectedCategory === category.id;
-          
-          return (
-            <TouchableOpacity
-              key={category.id}
-              style={[styles.categoryChip, isSelected && styles.categoryChipSelected]}
-              onPress={() => setSelectedCategory(category.id)}
-            >
-              <IconComponent 
-                size={16} 
-                color={isSelected ? '#ffffff' : '#6b7280'} 
-              />
-              <Text style={[
-                styles.categoryText,
-                isSelected && styles.categoryTextSelected
-              ]}>
-                {category.name}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.section}>
-          {filteredContent.map((item) => (
-            <EducationCard 
-              key={item.id} 
-              content={item} 
-              onPress={handleEducationCardPress}
-            />
-          ))}
+      <View style={styles.webContainer}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Learn & Improve</Text>
         </View>
-      </ScrollView>
+
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoriesScroll}
+          contentContainerStyle={styles.categoriesContainer}
+        >
+          {categories.map((category) => {
+            const IconComponent = category.icon;
+            const isSelected = selectedCategory === category.id;
+            
+            return (
+              <TouchableOpacity
+                key={category.id}
+                style={[styles.categoryChip, isSelected && styles.categoryChipSelected]}
+                onPress={() => setSelectedCategory(category.id)}
+              >
+                <IconComponent 
+                  size={16} 
+                  color={isSelected ? '#ffffff' : '#6b7280'} 
+                />
+                <Text style={[
+                  styles.categoryText,
+                  isSelected && styles.categoryTextSelected
+                ]}>
+                  {category.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <View style={styles.section}>
+            <View style={styles.cardsGrid}>
+              {filteredContent.map((item) => (
+                <View key={item.id} style={styles.cardWrapper}>
+                  <EducationCard 
+                    content={item} 
+                    onPress={handleEducationCardPress}
+                  />
+                </View>
+              ))}
+            </View>
+          </View>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -157,12 +162,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8fafc',
   },
+  webContainer: {
+    flex: 1,
+    ...Platform.select({
+      web: {
+        maxWidth: 1200,
+        alignSelf: 'center',
+        width: '100%',
+      },
+      default: {},
+    }),
+  },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb',
+    ...Platform.select({
+      web: {
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderLeftColor: '#e5e7eb',
+        borderRightColor: '#e5e7eb',
+      },
+      default: {},
+    }),
   },
   title: {
     fontSize: 24,
@@ -173,6 +198,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb',
+    ...Platform.select({
+      web: {
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderLeftColor: '#e5e7eb',
+        borderRightColor: '#e5e7eb',
+      },
+      default: {},
+    }),
   },
   categoriesContainer: {
     paddingHorizontal: 20,
@@ -205,8 +239,41 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
+    ...Platform.select({
+      web: {
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderLeftColor: '#e5e7eb',
+        borderRightColor: '#e5e7eb',
+      },
+      default: {},
+    }),
   },
   section: {
     marginBottom: 24,
+  },
+  cardsGrid: {
+    ...Platform.select({
+      web: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginHorizontal: -8,
+      },
+      default: {
+        flexDirection: 'column',
+      },
+    }),
+  },
+  cardWrapper: {
+    ...Platform.select({
+      web: {
+        width: '50%',
+        paddingHorizontal: 8,
+        marginBottom: 16,
+      },
+      default: {
+        width: '100%',
+      },
+    }),
   },
 });

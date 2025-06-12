@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CloudRain, Thermometer, Wind, Gauge, Moon, Sun } from 'lucide-react-native';
 import WeatherCard from '@/components/WeatherCard';
@@ -74,64 +74,66 @@ export default function ToolsTab() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Fishing Tools</Text>
+      <View style={styles.webContainer}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Fishing Tools</Text>
+        </View>
+
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Current Weather</Text>
+            {weather && <WeatherCard weather={weather} />}
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Conditions Analysis</Text>
+            <View style={styles.toolsGrid}>
+              {tools.map((tool) => (
+                <TouchableOpacity key={tool.id} style={styles.toolCard}>
+                  <View style={styles.toolHeader}>
+                    {tool.icon}
+                    <View style={styles.toolInfo}>
+                      <Text style={styles.toolTitle}>{tool.title}</Text>
+                      <Text style={styles.toolValue}>{tool.value}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.toolDescription}>{tool.description}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Solunar Calendar</Text>
+            <SolunarCard data={solunarData} />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Stream Flow Data</Text>
+            <StreamFlowCard locationName="Ruby River" />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Fly Recommendations</Text>
+            <View style={styles.recommendationsCard}>
+              <Text style={styles.recommendationsTitle}>
+                Based on Current Conditions
+              </Text>
+              {flyRecommendations.map((rec, index) => (
+                <View key={index} style={styles.recommendationItem}>
+                  <View style={styles.recommendationHeader}>
+                    <Text style={styles.patternName}>{rec.pattern}</Text>
+                    <View style={styles.confidenceBadge}>
+                      <Text style={styles.confidenceText}>{rec.confidence}%</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.recommendationReason}>{rec.reason}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        </ScrollView>
       </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Current Weather</Text>
-          {weather && <WeatherCard weather={weather} />}
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Conditions Analysis</Text>
-          <View style={styles.toolsGrid}>
-            {tools.map((tool) => (
-              <TouchableOpacity key={tool.id} style={styles.toolCard}>
-                <View style={styles.toolHeader}>
-                  {tool.icon}
-                  <View style={styles.toolInfo}>
-                    <Text style={styles.toolTitle}>{tool.title}</Text>
-                    <Text style={styles.toolValue}>{tool.value}</Text>
-                  </View>
-                </View>
-                <Text style={styles.toolDescription}>{tool.description}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Solunar Calendar</Text>
-          <SolunarCard data={solunarData} />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Stream Flow Data</Text>
-          <StreamFlowCard locationName="Ruby River" />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Fly Recommendations</Text>
-          <View style={styles.recommendationsCard}>
-            <Text style={styles.recommendationsTitle}>
-              Based on Current Conditions
-            </Text>
-            {flyRecommendations.map((rec, index) => (
-              <View key={index} style={styles.recommendationItem}>
-                <View style={styles.recommendationHeader}>
-                  <Text style={styles.patternName}>{rec.pattern}</Text>
-                  <View style={styles.confidenceBadge}>
-                    <Text style={styles.confidenceText}>{rec.confidence}%</Text>
-                  </View>
-                </View>
-                <Text style={styles.recommendationReason}>{rec.reason}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -141,12 +143,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8fafc',
   },
+  webContainer: {
+    flex: 1,
+    ...Platform.select({
+      web: {
+        maxWidth: 1200,
+        alignSelf: 'center',
+        width: '100%',
+      },
+      default: {},
+    }),
+  },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb',
+    ...Platform.select({
+      web: {
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderLeftColor: '#e5e7eb',
+        borderRightColor: '#e5e7eb',
+      },
+      default: {},
+    }),
   },
   title: {
     fontSize: 24,
@@ -156,18 +178,36 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
+    ...Platform.select({
+      web: {
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderLeftColor: '#e5e7eb',
+        borderRightColor: '#e5e7eb',
+      },
+      default: {},
+    }),
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 32,
   },
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'Inter-SemiBold',
     color: '#1f2937',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   toolsGrid: {
-    gap: 12,
+    ...Platform.select({
+      web: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginHorizontal: -8,
+      },
+      default: {
+        gap: 12,
+      },
+    }),
   },
   toolCard: {
     backgroundColor: '#ffffff',
@@ -175,6 +215,14 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: '#e5e7eb',
+    ...Platform.select({
+      web: {
+        width: 'calc(50% - 16px)',
+        marginHorizontal: 8,
+        marginBottom: 16,
+      },
+      default: {},
+    }),
   },
   toolHeader: {
     flexDirection: 'row',

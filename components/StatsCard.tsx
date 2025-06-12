@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ReactNode } from 'react-native';
+import { View, Text, StyleSheet, ReactNode, Platform } from 'react-native';
 
 interface StatsCardProps {
   icon: ReactNode;
@@ -25,10 +25,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
-    width: '48%',
-    marginBottom: 12,
     borderWidth: 1,
     borderColor: '#e5e7eb',
+    ...Platform.select({
+      web: {
+        width: 'calc(25% - 12px)',
+        marginHorizontal: 6,
+        marginBottom: 12,
+      },
+      default: {
+        width: '48%',
+        marginBottom: 12,
+      },
+    }),
   },
   iconContainer: {
     marginBottom: 8,

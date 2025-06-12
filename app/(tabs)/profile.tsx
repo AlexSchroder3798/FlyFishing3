@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User, Settings, LogOut, CreditCard as Edit3, MapPin, Calendar, Fish, Trophy } from 'lucide-react-native';
 import { getCurrentUser, signOut, getSession, onAuthStateChange } from '@/lib/database';
@@ -84,8 +84,10 @@ export default function ProfileTab() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading profile...</Text>
+        <View style={styles.webContainer}>
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading profile...</Text>
+          </View>
         </View>
       </SafeAreaView>
     );
@@ -94,37 +96,39 @@ export default function ProfileTab() {
   if (!isAuthenticated) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.authContainer}>
-          <View style={styles.authHeader}>
-            <User size={64} color="#2563eb" />
-            <Text style={styles.authTitle}>Welcome to FlyMaster</Text>
-            <Text style={styles.authSubtitle}>
-              Sign in to track your catches, share reports, and connect with the fishing community
-            </Text>
-          </View>
-
-          {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
+        <View style={styles.webContainer}>
+          <View style={styles.authContainer}>
+            <View style={styles.authHeader}>
+              <User size={64} color="#2563eb" />
+              <Text style={styles.authTitle}>Welcome to FlyMaster</Text>
+              <Text style={styles.authSubtitle}>
+                Sign in to track your catches, share reports, and connect with the fishing community
+              </Text>
             </View>
-          )}
 
-          <AuthButton onSuccess={handleAuthSuccess} onError={handleAuthError} />
+            {error && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            )}
 
-          <View style={styles.featuresContainer}>
-            <Text style={styles.featuresTitle}>What you'll get:</Text>
-            <View style={styles.featuresList}>
-              <View style={styles.featureItem}>
-                <Fish size={16} color="#2563eb" />
-                <Text style={styles.featureText}>Track your catches and fishing log</Text>
-              </View>
-              <View style={styles.featureItem}>
-                <MapPin size={16} color="#2563eb" />
-                <Text style={styles.featureText}>Discover new fishing locations</Text>
-              </View>
-              <View style={styles.featureItem}>
-                <Trophy size={16} color="#2563eb" />
-                <Text style={styles.featureText}>Share reports with the community</Text>
+            <AuthButton onSuccess={handleAuthSuccess} onError={handleAuthError} />
+
+            <View style={styles.featuresContainer}>
+              <Text style={styles.featuresTitle}>What you'll get:</Text>
+              <View style={styles.featuresList}>
+                <View style={styles.featureItem}>
+                  <Fish size={16} color="#2563eb" />
+                  <Text style={styles.featureText}>Track your catches and fishing log</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <MapPin size={16} color="#2563eb" />
+                  <Text style={styles.featureText}>Discover new fishing locations</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <Trophy size={16} color="#2563eb" />
+                  <Text style={styles.featureText}>Share reports with the community</Text>
+                </View>
               </View>
             </View>
           </View>
@@ -135,109 +139,111 @@ export default function ProfileTab() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Profile</Text>
-        <TouchableOpacity style={styles.settingsButton}>
-          <Settings size={20} color="#6b7280" />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {user && (
-          <>
-            <View style={styles.profileSection}>
-              <View style={styles.avatarContainer}>
-                {user.avatar ? (
-                  <Image source={{ uri: user.avatar }} style={styles.avatar} />
-                ) : (
-                  <View style={styles.avatarPlaceholder}>
-                    <User size={40} color="#6b7280" />
-                  </View>
-                )}
-                <TouchableOpacity style={styles.editAvatarButton}>
-                  <Edit3 size={16} color="#2563eb" />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.userInfo}>
-                <Text style={styles.username}>{user.username || 'Anonymous Angler'}</Text>
-                <Text style={styles.email}>{user.email}</Text>
-                {user.location && (
-                  <View style={styles.locationContainer}>
-                    <MapPin size={14} color="#6b7280" />
-                    <Text style={styles.location}>{user.location}</Text>
-                  </View>
-                )}
-              </View>
-            </View>
-
-            <View style={styles.statsSection}>
-              <Text style={styles.sectionTitle}>Fishing Stats</Text>
-              <View style={styles.statsGrid}>
-                <View style={styles.statCard}>
-                  <Fish size={24} color="#2563eb" />
-                  <Text style={styles.statValue}>{user.totalCatches}</Text>
-                  <Text style={styles.statLabel}>Total Catches</Text>
-                </View>
-                <View style={styles.statCard}>
-                  <Trophy size={24} color="#059669" />
-                  <Text style={styles.statValue}>{user.favoriteSpecies.length}</Text>
-                  <Text style={styles.statLabel}>Species</Text>
-                </View>
-                <View style={styles.statCard}>
-                  <Calendar size={24} color="#dc2626" />
-                  <Text style={styles.statValue}>
-                    {new Date().getFullYear() - user.joinDate.getFullYear()}
-                  </Text>
-                  <Text style={styles.statLabel}>Years</Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.experienceSection}>
-              <Text style={styles.sectionTitle}>Experience Level</Text>
-              <View style={styles.experienceCard}>
-                <Text style={styles.experienceLevel}>
-                  {user.experience.charAt(0).toUpperCase() + user.experience.slice(1)}
-                </Text>
-                <Text style={styles.experienceDescription}>
-                  {getExperienceDescription(user.experience)}
-                </Text>
-              </View>
-            </View>
-
-            {user.favoriteSpecies.length > 0 && (
-              <View style={styles.speciesSection}>
-                <Text style={styles.sectionTitle}>Favorite Species</Text>
-                <View style={styles.speciesList}>
-                  {user.favoriteSpecies.map((species, index) => (
-                    <View key={index} style={styles.speciesTag}>
-                      <Text style={styles.speciesText}>{species}</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
-          </>
-        )}
-
-        <View style={styles.actionsSection}>
-          <TouchableOpacity style={styles.actionButton}>
-            <Edit3 size={20} color="#2563eb" />
-            <Text style={styles.actionButtonText}>Edit Profile</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton}>
+      <View style={styles.webContainer}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Profile</Text>
+          <TouchableOpacity style={styles.settingsButton}>
             <Settings size={20} color="#6b7280" />
-            <Text style={styles.actionButtonText}>Settings</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-            <LogOut size={20} color="#dc2626" />
-            <Text style={styles.signOutButtonText}>Sign Out</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {user && (
+            <>
+              <View style={styles.profileSection}>
+                <View style={styles.avatarContainer}>
+                  {user.avatar ? (
+                    <Image source={{ uri: user.avatar }} style={styles.avatar} />
+                  ) : (
+                    <View style={styles.avatarPlaceholder}>
+                      <User size={40} color="#6b7280" />
+                    </View>
+                  )}
+                  <TouchableOpacity style={styles.editAvatarButton}>
+                    <Edit3 size={16} color="#2563eb" />
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.userInfo}>
+                  <Text style={styles.username}>{user.username || 'Anonymous Angler'}</Text>
+                  <Text style={styles.email}>{user.email}</Text>
+                  {user.location && (
+                    <View style={styles.locationContainer}>
+                      <MapPin size={14} color="#6b7280" />
+                      <Text style={styles.location}>{user.location}</Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+
+              <View style={styles.statsSection}>
+                <Text style={styles.sectionTitle}>Fishing Stats</Text>
+                <View style={styles.statsGrid}>
+                  <View style={styles.statCard}>
+                    <Fish size={24} color="#2563eb" />
+                    <Text style={styles.statValue}>{user.totalCatches}</Text>
+                    <Text style={styles.statLabel}>Total Catches</Text>
+                  </View>
+                  <View style={styles.statCard}>
+                    <Trophy size={24} color="#059669" />
+                    <Text style={styles.statValue}>{user.favoriteSpecies.length}</Text>
+                    <Text style={styles.statLabel}>Species</Text>
+                  </View>
+                  <View style={styles.statCard}>
+                    <Calendar size={24} color="#dc2626" />
+                    <Text style={styles.statValue}>
+                      {new Date().getFullYear() - user.joinDate.getFullYear()}
+                    </Text>
+                    <Text style={styles.statLabel}>Years</Text>
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.experienceSection}>
+                <Text style={styles.sectionTitle}>Experience Level</Text>
+                <View style={styles.experienceCard}>
+                  <Text style={styles.experienceLevel}>
+                    {user.experience.charAt(0).toUpperCase() + user.experience.slice(1)}
+                  </Text>
+                  <Text style={styles.experienceDescription}>
+                    {getExperienceDescription(user.experience)}
+                  </Text>
+                </View>
+              </View>
+
+              {user.favoriteSpecies.length > 0 && (
+                <View style={styles.speciesSection}>
+                  <Text style={styles.sectionTitle}>Favorite Species</Text>
+                  <View style={styles.speciesList}>
+                    {user.favoriteSpecies.map((species, index) => (
+                      <View key={index} style={styles.speciesTag}>
+                        <Text style={styles.speciesText}>{species}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+            </>
+          )}
+
+          <View style={styles.actionsSection}>
+            <TouchableOpacity style={styles.actionButton}>
+              <Edit3 size={20} color="#2563eb" />
+              <Text style={styles.actionButtonText}>Edit Profile</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.actionButton}>
+              <Settings size={20} color="#6b7280" />
+              <Text style={styles.actionButtonText}>Settings</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+              <LogOut size={20} color="#dc2626" />
+              <Text style={styles.signOutButtonText}>Sign Out</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -262,6 +268,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8fafc',
   },
+  webContainer: {
+    flex: 1,
+    ...Platform.select({
+      web: {
+        maxWidth: 1200,
+        alignSelf: 'center',
+        width: '100%',
+      },
+      default: {},
+    }),
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -271,6 +288,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb',
+    ...Platform.select({
+      web: {
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderLeftColor: '#e5e7eb',
+        borderRightColor: '#e5e7eb',
+      },
+      default: {},
+    }),
   },
   title: {
     fontSize: 24,
@@ -288,6 +314,15 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
+    ...Platform.select({
+      web: {
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderLeftColor: '#e5e7eb',
+        borderRightColor: '#e5e7eb',
+      },
+      default: {},
+    }),
   },
   loadingContainer: {
     flex: 1,
@@ -303,6 +338,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
+    ...Platform.select({
+      web: {
+        maxWidth: 500,
+        alignSelf: 'center',
+      },
+      default: {},
+    }),
   },
   authHeader: {
     alignItems: 'center',
@@ -439,16 +481,32 @@ const styles = StyleSheet.create({
   statsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    ...Platform.select({
+      web: {
+        flexWrap: 'wrap',
+        marginHorizontal: -4,
+      },
+      default: {},
+    }),
   },
   statCard: {
     backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
-    flex: 1,
-    marginHorizontal: 4,
     borderWidth: 1,
     borderColor: '#e5e7eb',
+    ...Platform.select({
+      web: {
+        width: 'calc(33.333% - 8px)',
+        marginHorizontal: 4,
+        marginBottom: 8,
+      },
+      default: {
+        flex: 1,
+        marginHorizontal: 4,
+      },
+    }),
   },
   statValue: {
     fontSize: 24,
