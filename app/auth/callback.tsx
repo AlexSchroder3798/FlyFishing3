@@ -13,62 +13,56 @@ export default function AuthCallback() {
 
   const handleAuthCallback = async () => {
     try {
-      // Wait a brief moment for the Root Layout to fully mount
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Set up auth state change listener immediately
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          console.log('Auth state change:', event, session?.user?.id);
+          
+          if (event === 'SIGNED_IN' && session?.user) {
+            console.log('Auth successful via state change:', session.user.email);
+            subscription.unsubscribe();
+            setIsProcessing(false);
+            router.replace('/(tabs)/profile');
+          } else if (event === 'SIGNED_OUT' || (event === 'TOKEN_REFRESHED' && !session)) {
+            subscription.unsubscribe();
+            setIsProcessing(false);
+            router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication failed'));
+          }
+        }
+      );
 
-      // Check if we have a session after the OAuth redirect
+      // Also check for existing session immediately
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {
         console.error('Session error:', error);
-        setTimeout(() => {
-          router.replace('/(tabs)/profile?error=' + encodeURIComponent(error.message));
-        }, 100);
+        subscription.unsubscribe();
+        setIsProcessing(false);
+        router.replace('/(tabs)/profile?error=' + encodeURIComponent(error.message));
         return;
       }
 
       if (session?.user) {
-        console.log('Auth successful:', session.user.email);
-        setTimeout(() => {
-          router.replace('/(tabs)/profile');
-        }, 100);
-      } else {
-        // Listen for auth state changes in case the session is still being processed
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          async (event, session) => {
-            if (event === 'SIGNED_IN' && session?.user) {
-              console.log('Auth successful via state change:', session.user.email);
-              subscription.unsubscribe();
-              setTimeout(() => {
-                router.replace('/(tabs)/profile');
-              }, 100);
-            } else if (event === 'SIGNED_OUT' || (event === 'TOKEN_REFRESHED' && !session)) {
-              subscription.unsubscribe();
-              setTimeout(() => {
-                router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication failed'));
-              }, 100);
-            }
-          }
-        );
-
-        // If no session after a reasonable timeout, consider it failed
-        setTimeout(() => {
-          subscription.unsubscribe();
-          if (isProcessing) {
-            setIsProcessing(false);
-            setTimeout(() => {
-              router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication timeout'));
-            }, 100);
-          }
-        }, 5000);
+        console.log('Auth successful via existing session:', session.user.email);
+        subscription.unsubscribe();
+        setIsProcessing(false);
+        router.replace('/(tabs)/profile');
+        return;
       }
+
+      // Set a timeout as a fallback
+      setTimeout(() => {
+        if (isProcessing) {
+          subscription.unsubscribe();
+          setIsProcessing(false);
+          router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication timeout'));
+        }
+      }, 10000); // 10 second timeout
+
     } catch (error) {
       console.error('Auth callback error:', error);
-      setTimeout(() => {
-        router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication failed'));
-      }, 100);
-    } finally {
       setIsProcessing(false);
+      router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication failed'));
     }
   };
 
