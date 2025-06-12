@@ -8,36 +8,25 @@ export default function AuthCallback() {
   const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
-  // If there is an access token in the URL fragment, force Supabase to process it
-  const hash = window.location.hash;
-  if (hash && hash.includes('access_token')) {
-    console.log('Found access token in URL hash, forcing refreshSession');
-    supabase.auth.refreshSession().then(() => {
-      console.log('refreshSession complete');
-      handleAuthCallback();
-    });
-  } else {
     handleAuthCallback();
-  }
-}, []);
-
+  }, []);
 
   const handleAuthCallback = async () => {
     try {
-      // Set up auth state change listener immediately
-      await supabase.auth.refreshSession();
+      console.log('Starting auth callback handling...');
       
-  
+      // Set up auth state change listener first
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         async (event, session) => {
           console.log('Auth state change:', event, session?.user?.id);
           
           if (event === 'SIGNED_IN' && session?.user) {
-            console.log('Auth successful via state change:', session.user.email);
+            console.log('Auth successful:', session.user.email);
             subscription.unsubscribe();
             setIsProcessing(false);
             router.replace('/(tabs)/profile');
           } else if (event === 'SIGNED_OUT' || (event === 'TOKEN_REFRESHED' && !session)) {
+            console.log('Auth failed or signed out');
             subscription.unsubscribe();
             setIsProcessing(false);
             router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication failed'));
@@ -45,7 +34,7 @@ export default function AuthCallback() {
         }
       );
 
-      // Also check for existing session immediately
+      // Check for existing session immediately
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {
@@ -57,7 +46,7 @@ export default function AuthCallback() {
       }
 
       if (session?.user) {
-        console.log('Auth successful via existing session:', session.user.email);
+        console.log('Found existing session:', session.user.email);
         subscription.unsubscribe();
         setIsProcessing(false);
         router.replace('/(tabs)/profile');
@@ -67,6 +56,7 @@ export default function AuthCallback() {
       // Set a timeout as a fallback
       setTimeout(() => {
         if (isProcessing) {
+          console.log('Auth callback timeout');
           subscription.unsubscribe();
           setIsProcessing(false);
           router.replace('/(tabs)/profile?error=' + encodeURIComponent('Authentication timeout'));
@@ -84,6 +74,7 @@ export default function AuthCallback() {
     <View style={styles.container}>
       <ActivityIndicator size="large" color="#2563eb" />
       <Text style={styles.text}>Completing authentication...</Text>
+      <Text style={styles.subtext}>Please wait while we sign you in</Text>
     </View>
   );
 }
@@ -94,11 +85,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f8fafc',
+    padding: 20,
   },
   text: {
     marginTop: 16,
     fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#1f2937',
+    textAlign: 'center',
+  },
+  subtext: {
+    marginTop: 8,
+    fontSize: 14,
     fontFamily: 'Inter-Regular',
     color: '#6b7280',
+    textAlign: 'center',
   },
 });
