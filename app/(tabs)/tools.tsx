@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CloudRain, Thermometer, Wind, Gauge, Moon, Sun } from 'lucide-react-native';
 import WeatherCard from '@/components/WeatherCard';
 import SolunarCard from '@/components/SolunarCard';
@@ -15,6 +16,7 @@ export default function ToolsTab() {
     rating: 4,
     moonPhase: 'Waxing Crescent'
   });
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     loadWeatherData();
@@ -82,7 +84,10 @@ export default function ToolsTab() {
         <ScrollView 
           style={styles.content} 
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollViewContent}
+          contentContainerStyle={[
+            styles.scrollViewContent,
+            { paddingBottom: Math.max(insets.bottom + 80, Platform.OS === 'ios' ? 100 : 88) }
+          ]}
         >
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Current Weather</Text>
@@ -193,7 +198,7 @@ const styles = StyleSheet.create({
     }),
   },
   scrollViewContent: {
-    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
+    flexGrow: 1,
   },
   section: {
     marginBottom: 32,

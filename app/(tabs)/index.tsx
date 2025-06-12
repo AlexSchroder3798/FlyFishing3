@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Search, MapPin, Thermometer, Droplets, Wind } from 'lucide-react-native';
 import LocationCard from '@/components/LocationCard';
 import WaterConditionsCard from '@/components/WaterConditionsCard';
@@ -14,6 +15,7 @@ export default function ExploreTab() {
   const [hatchEvents, setHatchEvents] = useState<HatchEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     loadData();
@@ -99,7 +101,10 @@ export default function ExploreTab() {
         <ScrollView 
           style={styles.content} 
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollViewContent}
+          contentContainerStyle={[
+            styles.scrollViewContent,
+            { paddingBottom: Math.max(insets.bottom + 80, Platform.OS === 'ios' ? 100 : 88) }
+          ]}
         >
           {waterConditions.length > 0 && (
             <View style={styles.section}>
@@ -220,7 +225,7 @@ const styles = StyleSheet.create({
     }),
   },
   scrollViewContent: {
-    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
+    flexGrow: 1,
   },
   section: {
     marginBottom: 32,

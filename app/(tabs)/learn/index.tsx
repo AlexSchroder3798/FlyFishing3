@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Book, Video, Scissors, Banknote as Knot, Fish, CircleAlert as AlertCircle } from 'lucide-react-native';
 import EducationCard from '@/components/EducationCard';
@@ -19,6 +20,7 @@ interface EducationContent {
 export default function LearnTab() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const categories = [
     { id: 'all', name: 'All', icon: Book },
@@ -141,7 +143,10 @@ export default function LearnTab() {
         <ScrollView 
           style={styles.content} 
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollViewContent}
+          contentContainerStyle={[
+            styles.scrollViewContent,
+            { paddingBottom: Math.max(insets.bottom + 80, Platform.OS === 'ios' ? 100 : 88) }
+          ]}
         >
           <View style={styles.section}>
             <View style={styles.cardsGrid}>
@@ -254,7 +259,7 @@ const styles = StyleSheet.create({
     }),
   },
   scrollViewContent: {
-    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
+    flexGrow: 1,
   },
   section: {
     marginBottom: 24,

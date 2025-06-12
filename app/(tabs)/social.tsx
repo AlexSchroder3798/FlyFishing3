@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MessageCircle, Users, Star, TrendingUp, MapPin } from 'lucide-react-native';
 import ReportCard from '@/components/ReportCard';
 import GuideCard from '@/components/GuideCard';
@@ -13,6 +14,7 @@ export default function SocialTab() {
   const [guides, setGuides] = useState<Guide[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     loadData();
@@ -174,7 +176,10 @@ export default function SocialTab() {
         <ScrollView 
           style={styles.content} 
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollViewContent}
+          contentContainerStyle={[
+            styles.scrollViewContent,
+            { paddingBottom: Math.max(insets.bottom + 80, Platform.OS === 'ios' ? 100 : 88) }
+          ]}
         >
           {renderContent()}
         </ScrollView>
@@ -281,7 +286,7 @@ const styles = StyleSheet.create({
     }),
   },
   scrollViewContent: {
-    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
+    flexGrow: 1,
   },
   section: {
     marginBottom: 24,

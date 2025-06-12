@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { User, Settings, LogOut, CreditCard as Edit3, MapPin, Calendar, Fish, Trophy } from 'lucide-react-native';
 import { getCurrentUser, signOut, getSession, onAuthStateChange } from '@/lib/database';
 import { User as UserType } from '@/types';
@@ -11,6 +12,7 @@ export default function ProfileTab() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     checkAuthStatus();
@@ -99,7 +101,10 @@ export default function ProfileTab() {
         <View style={styles.webContainer}>
           <ScrollView 
             style={styles.authScrollView}
-            contentContainerStyle={styles.authScrollViewContent}
+            contentContainerStyle={[
+              styles.authScrollViewContent,
+              { paddingBottom: Math.max(insets.bottom + 80, Platform.OS === 'ios' ? 100 : 88) }
+            ]}
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.authContainer}>
@@ -156,7 +161,10 @@ export default function ProfileTab() {
         <ScrollView 
           style={styles.content} 
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollViewContent}
+          contentContainerStyle={[
+            styles.scrollViewContent,
+            { paddingBottom: Math.max(insets.bottom + 80, Platform.OS === 'ios' ? 100 : 88) }
+          ]}
         >
           {user && (
             <>
@@ -335,7 +343,7 @@ const styles = StyleSheet.create({
     }),
   },
   scrollViewContent: {
-    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
+    flexGrow: 1,
   },
   loadingContainer: {
     flex: 1,
@@ -353,7 +361,6 @@ const styles = StyleSheet.create({
   authScrollViewContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
   },
   authContainer: {
     flex: 1,

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Plus, Calendar, Fish, TrendingUp } from 'lucide-react-native';
 import CatchCard from '@/components/CatchCard';
 import StatsCard from '@/components/StatsCard';
@@ -17,6 +18,7 @@ export default function LogTab() {
     bestMonth: '',
     averageSize: 0
   });
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     loadCatchData();
@@ -154,7 +156,10 @@ export default function LogTab() {
         <ScrollView 
           style={styles.content} 
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollViewContent}
+          contentContainerStyle={[
+            styles.scrollViewContent,
+            { paddingBottom: Math.max(insets.bottom + 80, Platform.OS === 'ios' ? 100 : 88) }
+          ]}
         >
           <View style={styles.statsSection}>
             <Text style={styles.sectionTitle}>Season Stats</Text>
@@ -273,7 +278,7 @@ const styles = StyleSheet.create({
     }),
   },
   scrollViewContent: {
-    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
+    flexGrow: 1,
   },
   statsSection: {
     marginBottom: 32,
