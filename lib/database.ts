@@ -578,7 +578,6 @@ export async function signInWithGoogle() {
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
-          // 🚩 Do NOT set "state" manually here!
         },
       },
     });
@@ -600,24 +599,9 @@ export async function signInWithGoogle() {
       );
 
       if (result.type === 'success') {
-        // Parse the URL to extract the session
-        const url = new URL(result.url);
-        const accessToken = url.searchParams.get('access_token');
-        const refreshToken = url.searchParams.get('refresh_token');
-
-        if (accessToken) {
-          // Set the session manually for mobile
-          const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken || '',
-          });
-
-          if (sessionError) {
-            throw new Error(sessionError.message);
-          }
-
-          return sessionData;
-        }
+        // Let the AuthCallback component handle the session establishment
+        // via the onAuthStateChange listener - don't manually set session here
+        return { success: true };
       } else if (result.type === 'cancel') {
         throw new Error('Authentication was cancelled');
       } else {
@@ -680,22 +664,9 @@ export async function signInWithApple() {
       );
 
       if (result.type === 'success') {
-        const url = new URL(result.url);
-        const accessToken = url.searchParams.get('access_token');
-        const refreshToken = url.searchParams.get('refresh_token');
-        
-        if (accessToken) {
-          const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken || ''
-          });
-
-          if (sessionError) {
-            throw new Error(sessionError.message);
-          }
-
-          return sessionData;
-        }
+        // Let the AuthCallback component handle the session establishment
+        // via the onAuthStateChange listener - don't manually set session here
+        return { success: true };
       } else if (result.type === 'cancel') {
         throw new Error('Authentication was cancelled');
       } else {
