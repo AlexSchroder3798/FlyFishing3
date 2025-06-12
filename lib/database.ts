@@ -563,16 +563,13 @@ export async function signIn(email: string, password: string) {
  */
 export async function signInWithGoogle() {
   try {
-    // Create a secure random state parameter for PKCE
-    const state = Crypto.randomUUID();
-    
     // Generate redirect URI based on platform
     const redirectUri = Platform.select({
       web: `${window.location.origin}/auth/callback`,
       default: makeRedirectUri({
         scheme: 'flymaster',
-        path: 'auth/callback'
-      })
+        path: 'auth/callback',
+      }),
     });
 
     console.log('Google OAuth redirect URI:', redirectUri);
@@ -584,9 +581,9 @@ export async function signInWithGoogle() {
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
-          state: state
-        }
-      }
+          // 🚩 Do NOT set "state" manually here!
+        },
+      },
     });
 
     if (error) {
@@ -610,12 +607,12 @@ export async function signInWithGoogle() {
         const url = new URL(result.url);
         const accessToken = url.searchParams.get('access_token');
         const refreshToken = url.searchParams.get('refresh_token');
-        
+
         if (accessToken) {
           // Set the session manually for mobile
           const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
             access_token: accessToken,
-            refresh_token: refreshToken || ''
+            refresh_token: refreshToken || '',
           });
 
           if (sessionError) {
@@ -637,6 +634,7 @@ export async function signInWithGoogle() {
     throw error;
   }
 }
+
 
 /**
  * Sign in with Apple using OAuth
