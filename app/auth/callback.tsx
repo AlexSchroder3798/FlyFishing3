@@ -14,6 +14,8 @@ export default function AuthCallback() {
   const handleAuthCallback = async () => {
     try {
       // Set up auth state change listener immediately
+      await supabase.auth.refreshSession();
+
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         async (event, session) => {
           console.log('Auth state change:', event, session?.user?.id);
