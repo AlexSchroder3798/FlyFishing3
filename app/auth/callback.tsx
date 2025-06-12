@@ -8,13 +8,29 @@ export default function AuthCallback() {
   const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
+  const hash = window.location.hash;
+  console.log("Current location.hash:", hash);
+
+  if (hash.includes("access_token")) {
+    console.log("Processing URL hash...");
+    supabase.auth._processUrlHash(hash).then(() => {
+      console.log("Supabase processed URL hash.");
+      handleAuthCallback();
+    });
+  } else {
     handleAuthCallback();
-  }, []);
+  }
+}, []);
+
 
   const handleAuthCallback = async () => {
     try {
       console.log('Starting auth callback handling...');
-      
+
+      console.log("Current location.hash:", window.location.hash);
+      await supabase.auth.refreshSession();
+      console.log("refreshSession complete");
+
       // Set up auth state change listener first
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         async (event, session) => {
