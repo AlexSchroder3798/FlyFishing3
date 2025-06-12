@@ -73,13 +73,17 @@ export default function ToolsTab() {
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.webContainer}>
         <View style={styles.header}>
           <Text style={styles.title}>Fishing Tools</Text>
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.content} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollViewContent}
+        >
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Current Weather</Text>
             {weather && <WeatherCard weather={weather} />}
@@ -187,6 +191,9 @@ const styles = StyleSheet.create({
       },
       default: {},
     }),
+  },
+  scrollViewContent: {
+    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
   },
   section: {
     marginBottom: 32,

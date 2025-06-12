@@ -94,7 +94,7 @@ export default function LogTab() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
         <View style={styles.webContainer}>
           <View style={styles.header}>
             <Text style={styles.title}>My Fishing Log</Text>
@@ -116,7 +116,7 @@ export default function LogTab() {
 
   if (error) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
         <View style={styles.webContainer}>
           <View style={styles.header}>
             <Text style={styles.title}>My Fishing Log</Text>
@@ -139,7 +139,7 @@ export default function LogTab() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.webContainer}>
         <View style={styles.header}>
           <Text style={styles.title}>My Fishing Log</Text>
@@ -151,7 +151,11 @@ export default function LogTab() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.content} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollViewContent}
+        >
           <View style={styles.statsSection}>
             <Text style={styles.sectionTitle}>Season Stats</Text>
             <View style={styles.statsGrid}>
@@ -267,6 +271,9 @@ const styles = StyleSheet.create({
       },
       default: {},
     }),
+  },
+  scrollViewContent: {
+    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
   },
   statsSection: {
     marginBottom: 32,

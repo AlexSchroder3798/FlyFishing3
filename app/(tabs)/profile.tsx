@@ -83,7 +83,7 @@ export default function ProfileTab() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
         <View style={styles.webContainer}>
           <View style={styles.loadingContainer}>
             <Text style={styles.loadingText}>Loading profile...</Text>
@@ -95,50 +95,56 @@ export default function ProfileTab() {
 
   if (!isAuthenticated) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
         <View style={styles.webContainer}>
-          <View style={styles.authContainer}>
-            <View style={styles.authHeader}>
-              <User size={64} color="#2563eb" />
-              <Text style={styles.authTitle}>Welcome to FlyMaster</Text>
-              <Text style={styles.authSubtitle}>
-                Sign in to track your catches, share reports, and connect with the fishing community
-              </Text>
-            </View>
-
-            {error && (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
+          <ScrollView 
+            style={styles.authScrollView}
+            contentContainerStyle={styles.authScrollViewContent}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.authContainer}>
+              <View style={styles.authHeader}>
+                <User size={64} color="#2563eb" />
+                <Text style={styles.authTitle}>Welcome to FlyMaster</Text>
+                <Text style={styles.authSubtitle}>
+                  Sign in to track your catches, share reports, and connect with the fishing community
+                </Text>
               </View>
-            )}
 
-            <AuthButton onSuccess={handleAuthSuccess} onError={handleAuthError} />
+              {error && (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{error}</Text>
+                </View>
+              )}
 
-            <View style={styles.featuresContainer}>
-              <Text style={styles.featuresTitle}>What you'll get:</Text>
-              <View style={styles.featuresList}>
-                <View style={styles.featureItem}>
-                  <Fish size={16} color="#2563eb" />
-                  <Text style={styles.featureText}>Track your catches and fishing log</Text>
-                </View>
-                <View style={styles.featureItem}>
-                  <MapPin size={16} color="#2563eb" />
-                  <Text style={styles.featureText}>Discover new fishing locations</Text>
-                </View>
-                <View style={styles.featureItem}>
-                  <Trophy size={16} color="#2563eb" />
-                  <Text style={styles.featureText}>Share reports with the community</Text>
+              <AuthButton onSuccess={handleAuthSuccess} onError={handleAuthError} />
+
+              <View style={styles.featuresContainer}>
+                <Text style={styles.featuresTitle}>What you'll get:</Text>
+                <View style={styles.featuresList}>
+                  <View style={styles.featureItem}>
+                    <Fish size={16} color="#2563eb" />
+                    <Text style={styles.featureText}>Track your catches and fishing log</Text>
+                  </View>
+                  <View style={styles.featureItem}>
+                    <MapPin size={16} color="#2563eb" />
+                    <Text style={styles.featureText}>Discover new fishing locations</Text>
+                  </View>
+                  <View style={styles.featureItem}>
+                    <Trophy size={16} color="#2563eb" />
+                    <Text style={styles.featureText}>Share reports with the community</Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
+          </ScrollView>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.webContainer}>
         <View style={styles.header}>
           <Text style={styles.title}>Profile</Text>
@@ -147,7 +153,11 @@ export default function ProfileTab() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.content} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollViewContent}
+        >
           {user && (
             <>
               <View style={styles.profileSection}>
@@ -324,6 +334,9 @@ const styles = StyleSheet.create({
       default: {},
     }),
   },
+  scrollViewContent: {
+    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -333,6 +346,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-Regular',
     color: '#6b7280',
+  },
+  authScrollView: {
+    flex: 1,
+  },
+  authScrollViewContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
   },
   authContainer: {
     flex: 1,

@@ -101,7 +101,7 @@ export default function LearnTab() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.webContainer}>
         <View style={styles.header}>
           <Text style={styles.title}>Learn & Improve</Text>
@@ -138,7 +138,11 @@ export default function LearnTab() {
           })}
         </ScrollView>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.content} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollViewContent}
+        >
           <View style={styles.section}>
             <View style={styles.cardsGrid}>
               {filteredContent.map((item) => (
@@ -248,6 +252,9 @@ const styles = StyleSheet.create({
       },
       default: {},
     }),
+  },
+  scrollViewContent: {
+    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
   },
   section: {
     marginBottom: 24,

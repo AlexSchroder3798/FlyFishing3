@@ -48,7 +48,7 @@ export default function ExploreTab() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
         <View style={styles.webContainer}>
           <View style={styles.header}>
             <Text style={styles.title}>Explore Waters</Text>
@@ -67,7 +67,7 @@ export default function ExploreTab() {
 
   if (error) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
         <View style={styles.webContainer}>
           <View style={styles.header}>
             <Text style={styles.title}>Explore Waters</Text>
@@ -87,7 +87,7 @@ export default function ExploreTab() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.webContainer}>
         <View style={styles.header}>
           <Text style={styles.title}>Explore Waters</Text>
@@ -96,7 +96,11 @@ export default function ExploreTab() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.content} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollViewContent}
+        >
           {waterConditions.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Current Conditions</Text>
@@ -214,6 +218,9 @@ const styles = StyleSheet.create({
       },
       default: {},
     }),
+  },
+  scrollViewContent: {
+    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
   },
   section: {
     marginBottom: 32,

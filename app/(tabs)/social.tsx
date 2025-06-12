@@ -136,7 +136,7 @@ export default function SocialTab() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.webContainer}>
         <View style={styles.header}>
           <Text style={styles.title}>Community</Text>
@@ -171,7 +171,11 @@ export default function SocialTab() {
           })}
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.content} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollViewContent}
+        >
           {renderContent()}
         </ScrollView>
       </View>
@@ -275,6 +279,9 @@ const styles = StyleSheet.create({
       },
       default: {},
     }),
+  },
+  scrollViewContent: {
+    paddingBottom: Platform.OS === 'ios' ? 85 : 60,
   },
   section: {
     marginBottom: 24,
