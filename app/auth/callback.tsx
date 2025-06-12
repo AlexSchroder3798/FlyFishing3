@@ -8,14 +8,26 @@ export default function AuthCallback() {
   const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
+  // If there is an access token in the URL fragment, force Supabase to process it
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token')) {
+    console.log('Found access token in URL hash, forcing refreshSession');
+    supabase.auth.refreshSession().then(() => {
+      console.log('refreshSession complete');
+      handleAuthCallback();
+    });
+  } else {
     handleAuthCallback();
-  }, []);
+  }
+}, []);
+
 
   const handleAuthCallback = async () => {
     try {
       // Set up auth state change listener immediately
       await supabase.auth.refreshSession();
-
+      
+  
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         async (event, session) => {
           console.log('Auth state change:', event, session?.user?.id);
