@@ -563,13 +563,10 @@ export async function signIn(email: string, password: string) {
  */
 export async function signInWithGoogle() {
   try {
-    // Generate redirect URI based on platform
-    const redirectUri = Platform.select({
-      web: `${window.location.origin}/auth/callback`,
-      default: makeRedirectUri({
-        scheme: 'flymaster',
-        path: 'auth/callback',
-      }),
+    // Use makeRedirectUri to automatically determine the correct redirect URI for the current platform
+    const redirectUri = makeRedirectUri({
+      scheme: 'flymaster',
+      path: 'auth/callback',
     });
 
     console.log('Google OAuth redirect URI:', redirectUri);
@@ -649,12 +646,10 @@ export async function signInWithApple() {
 
     const state = Crypto.randomUUID();
     
-    const redirectUri = Platform.select({
-      web: `${window.location.origin}/auth/callback`,
-      default: makeRedirectUri({
-        scheme: 'flymaster',
-        path: 'auth/callback'
-      })
+    // Use makeRedirectUri to automatically determine the correct redirect URI for the current platform
+    const redirectUri = makeRedirectUri({
+      scheme: 'flymaster',
+      path: 'auth/callback'
     });
 
     console.log('Apple OAuth redirect URI:', redirectUri);
