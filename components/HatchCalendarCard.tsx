@@ -42,11 +42,11 @@ export default function HatchCalendarCard({ hatch }: HatchCalendarCardProps) {
       <View style={styles.timing}>
         <View style={styles.timingItem}>
           <Calendar size={14} color="#6b7280" />
-          <Text style={styles.timingText}>{getDaysRemaining()}</Text>
+          <Text style={styles.timingText} numberOfLines={1}>{getDaysRemaining()}</Text>
         </View>
         <View style={styles.timingItem}>
           <Clock size={14} color="#6b7280" />
-          <Text style={styles.timingText}>{hatch.peakTime}</Text>
+          <Text style={styles.timingText} numberOfLines={1}>{hatch.peakTime}</Text>
         </View>
       </View>
 
@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     borderColor: '#e5e7eb',
+    minHeight: 180, // Ensures consistent card height
   },
   activeCard: {
     borderColor: '#22c55e',
@@ -116,18 +117,21 @@ const styles = StyleSheet.create({
   },
   timing: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 12,
   },
   timingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 16,
+    flex: 1,
+    marginHorizontal: 2,
   },
   timingText: {
     marginLeft: 4,
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: 'Inter-Regular',
     color: '#4b5563',
+    flexShrink: 1,
   },
   flies: {
     marginBottom: 8,
