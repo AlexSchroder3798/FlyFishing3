@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { User, Settings, LogOut, CreditCard as Edit3, MapPin, Calendar, Fish, Trophy } from 'lucide-react-native';
+import { User, Settings, LogOut, CreditCard as Edit3, MapPin, Calendar, Fish, Trophy, Shield, FileText } from 'lucide-react-native';
+import { Link } from 'expo-router';
 import { getCurrentUser, signOut, getSession, onAuthStateChange } from '@/lib/database';
 import { User as UserType } from '@/types';
 import AuthButton from '@/components/AuthButton';
@@ -141,6 +142,25 @@ export default function ProfileTab() {
                   </View>
                 </View>
               </View>
+
+              {/* Legal Links for Non-Authenticated Users */}
+              <View style={styles.legalSection}>
+                <Text style={styles.legalTitle}>Legal Information</Text>
+                <View style={styles.legalLinks}>
+                  <Link href="/(legal)/privacy" asChild>
+                    <TouchableOpacity style={styles.legalLink}>
+                      <Shield size={16} color="#6b7280" />
+                      <Text style={styles.legalLinkText}>Privacy Policy</Text>
+                    </TouchableOpacity>
+                  </Link>
+                  <Link href="/(legal)/terms" asChild>
+                    <TouchableOpacity style={styles.legalLink}>
+                      <FileText size={16} color="#6b7280" />
+                      <Text style={styles.legalLinkText}>Terms & Conditions</Text>
+                    </TouchableOpacity>
+                  </Link>
+                </View>
+              </View>
             </View>
           </ScrollView>
         </View>
@@ -254,7 +274,27 @@ export default function ProfileTab() {
               <Settings size={20} color="#6b7280" />
               <Text style={styles.actionButtonText}>Settings</Text>
             </TouchableOpacity>
+          </View>
 
+          {/* Legal Section for Authenticated Users */}
+          <View style={styles.legalSection}>
+            <Text style={styles.sectionTitle}>Legal & Privacy</Text>
+            <Link href="/(legal)/privacy" asChild>
+              <TouchableOpacity style={styles.actionButton}>
+                <Shield size={20} color="#6b7280" />
+                <Text style={styles.actionButtonText}>Privacy Policy</Text>
+              </TouchableOpacity>
+            </Link>
+
+            <Link href="/(legal)/terms" asChild>
+              <TouchableOpacity style={styles.actionButton}>
+                <FileText size={20} color="#6b7280" />
+                <Text style={styles.actionButtonText}>Terms & Conditions</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
+
+          <View style={styles.signOutSection}>
             <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
               <LogOut size={20} color="#dc2626" />
               <Text style={styles.signOutButtonText}>Sign Out</Text>
@@ -591,6 +631,7 @@ const styles = StyleSheet.create({
   },
   actionsSection: {
     gap: 12,
+    marginBottom: 20,
   },
   actionButton: {
     flexDirection: 'row',
@@ -606,6 +647,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-Medium',
     color: '#1f2937',
+  },
+  legalSection: {
+    marginBottom: 20,
+  },
+  legalTitle: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#1f2937',
+    marginBottom: 12,
+  },
+  legalLinks: {
+    gap: 8,
+  },
+  legalLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+  },
+  legalLinkText: {
+    marginLeft: 8,
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#6b7280',
+  },
+  signOutSection: {
+    marginTop: 8,
   },
   signOutButton: {
     flexDirection: 'row',
