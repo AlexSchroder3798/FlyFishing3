@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Calendar, Clock, Zap } from 'lucide-react-native';
 import { HatchEvent } from '@/types';
+import { formatRecommendedFliesFromInsect } from '@/lib/flyMappings';
 
 interface HatchCalendarCardProps {
   hatch: HatchEvent;
@@ -52,14 +53,17 @@ export default function HatchCalendarCard({ hatch }: HatchCalendarCardProps) {
 
       <View style={styles.flies}>
         <Text style={styles.fliesLabel}>Recommended Flies:</Text>
-        <View style={styles.fliesList}>
-          {hatch.recommendedFlies.map((fly, index) => (
-            <View key={index} style={styles.flyTag}>
-              <Text style={styles.flyText}>{fly}</Text>
-            </View>
-          ))}
-        </View>
+          <View style={styles.fliesList}>
+            {formatRecommendedFliesFromInsect(hatch.insect)
+            .split(', ')
+            .map((fly, index) => (
+          <View key={index} style={styles.flyTag}>
+            <Text style={styles.flyText}>{fly}</Text>
+          </View>
+        ))}
       </View>
+    </View>
+
 
       {hatch.notes && (
         <Text style={styles.notes}>💡 {hatch.notes}</Text>
