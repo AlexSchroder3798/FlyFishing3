@@ -104,6 +104,16 @@ export default function PrivacyPolicy() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
+            <Database size={20} color="#2563eb" />
+              <Text style={styles.sectionTitle}>Data Retention</Text>
+          </View>
+            <Text style={styles.sectionContent}>
+              We retain your personal information only for as long as necessary to provide you with our services and as described in this Privacy Policy. You may request deletion of your data at any time.
+            </Text>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
             <Mail size={20} color="#2563eb" />
             <Text style={styles.sectionTitle}>Contact Us</Text>
           </View>
