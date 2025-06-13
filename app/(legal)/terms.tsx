@@ -17,7 +17,7 @@ export default function TermsAndConditions() {
           <Text style={styles.subtitle}>
             Please read these terms carefully before using FlyMaster. By using our app, you agree to these terms.
           </Text>
-          <Text style={styles.lastUpdated}>Last updated: January 2025</Text>
+          <Text style={styles.lastUpdated}>Last updated: June 2025</Text>
         </View>
 
         <View style={styles.section}>
