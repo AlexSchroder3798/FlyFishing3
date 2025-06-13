@@ -36,11 +36,15 @@ export default function WaterConditionsCard({ location, condition }: WaterCondit
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.locationName}>{location.name}</Text>
+        <View style={styles.locationContainer}>
+          <Text style={styles.locationName} numberOfLines={2}>
+            {location.name}
+          </Text>
+        </View>
         <View style={styles.updateTime}>
-          <Clock size={12} color="#6b7280" />
-          <Text style={styles.updateText}>
-            Updated {formatTime(condition.lastUpdated)}
+          <Clock size={10} color="#6b7280" />
+          <Text style={styles.updateText} numberOfLines={1}>
+            {formatTime(condition.lastUpdated)}
           </Text>
         </View>
       </View>
@@ -95,27 +99,37 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     borderColor: '#e5e7eb',
+    minHeight: 160, // Ensures consistent card height
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 12,
+    minHeight: 32, // Ensures consistent header height
+  },
+  locationContainer: {
+    flex: 1,
+    marginRight: 8,
   },
   locationName: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     color: '#1f2937',
+    lineHeight: 20,
   },
   updateTime: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 0, // Prevents shrinking
+    maxWidth: 80, // Limits width to prevent overflow
   },
   updateText: {
-    marginLeft: 4,
-    fontSize: 11,
+    marginLeft: 3,
+    fontSize: 9,
     fontFamily: 'Inter-Regular',
     color: '#6b7280',
+    flexShrink: 1, // Allows text to shrink if needed
   },
   conditions: {
     flexDirection: 'row',
