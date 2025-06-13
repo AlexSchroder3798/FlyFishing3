@@ -110,8 +110,7 @@ export default function PrivacyPolicy() {
             If you have any questions about this Privacy Policy or our data practices, please contact us at:
           </Text>
           <View style={styles.contactInfo}>
-            <Text style={styles.contactText}>Email: privacy@flymaster.app</Text>
-            <Text style={styles.contactText}>Address: 123 Fishing Lane, Bozeman, MT 59718</Text>
+            <Text style={styles.contactText}>Email: flymaster.site@gmail.com</Text>
           </View>
         </View>
 
