@@ -138,8 +138,7 @@ export default function TermsAndConditions() {
             If you have any questions about these Terms and Conditions, please contact us at:
           </Text>
           <View style={styles.contactInfo}>
-            <Text style={styles.contactText}>Email: legal@flymaster.app</Text>
-            <Text style={styles.contactText}>Address: 123 Fishing Lane, Bozeman, MT 59718</Text>
+            <Text style={styles.contactText}>Email: flymaster.site@gmail.com</Text>
           </View>
         </View>
 
