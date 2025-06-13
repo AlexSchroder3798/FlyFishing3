@@ -46,6 +46,8 @@ export default function TermsAndConditions() {
             <Text style={styles.bulletPoint}>• Use the materials for any commercial purpose or for any public display</Text>
             <Text style={styles.bulletPoint}>• Attempt to reverse engineer any software contained in the app</Text>
             <Text style={styles.bulletPoint}>• Remove any copyright or other proprietary notations from the materials</Text>
+            <Text style={styles.bulletPoint}>• Use the app in a way that misrepresents fishing regulations or promotes illegal fishing activity</Text>
+
           </View>
         </View>
 
@@ -117,6 +119,16 @@ export default function TermsAndConditions() {
           <Text style={styles.sectionContent}>
             In no event shall FlyMaster or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on FlyMaster's app.
           </Text>
+        </View>
+        
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Scale size={20} color="#2563eb" />
+            <Text style={styles.sectionTitle}>Governing Law</Text>
+          </View>
+            <Text style={styles.sectionContent}>
+              These terms and conditions are governed by and construed in accordance with the laws of the State of Georgia, without regard to its conflict of law provisions.
+            </Text>
         </View>
 
         <View style={styles.section}>
