@@ -98,6 +98,7 @@ export default function PrivacyPolicy() {
             <Text style={styles.bulletPoint}>• To comply with legal obligations</Text>
             <Text style={styles.bulletPoint}>• To protect our rights and prevent fraud</Text>
             <Text style={styles.bulletPoint}>• With service providers who help us operate the app</Text>
+            <Text style={styles.bulletPoint}>• As part of aggregated, anonymized data used to improve our app</Text>
           </View>
         </View>
 
