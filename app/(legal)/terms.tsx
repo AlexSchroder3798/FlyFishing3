@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FileText, Users, AlertTriangle, Scale, Mail } from 'lucide-react-native';
+import { FileText, Users, TriangleAlert as AlertTriangle, Scale, Mail } from 'lucide-react-native';
 
 export default function TermsAndConditions() {
   return (
