@@ -17,7 +17,7 @@ export default function PrivacyPolicy() {
           <Text style={styles.subtitle}>
             Your privacy is important to us. This policy explains how we collect, use, and protect your information.
           </Text>
-          <Text style={styles.lastUpdated}>Last updated: January 2025</Text>
+          <Text style={styles.lastUpdated}>Last updated: June 2025</Text>
         </View>
 
         <View style={styles.section}>
