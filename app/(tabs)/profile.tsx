@@ -8,6 +8,17 @@ import { getCurrentUser, signOut, getSession, onAuthStateChange } from '@/lib/da
 import { User as UserType } from '@/types';
 import AuthButton from '@/components/AuthButton';
 
+const DEFAULT_TIMEOUT_MS = 10000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number = DEFAULT_TIMEOUT_MS): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error('Operation timed out')), ms)
+    ),
+  ]);
+}
+
 export default function ProfileTab() {
   const [user, setUser] = useState<UserType | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -38,8 +49,8 @@ export default function ProfileTab() {
   const checkAuthStatus = async () => {
     try {
       setLoading(true);
-      const session = await getSession();
-      
+      const session = await withTimeout(getSession());
+
       if (session?.user) {
         setIsAuthenticated(true);
         await loadUserProfile();
@@ -48,7 +59,8 @@ export default function ProfileTab() {
       }
     } catch (err) {
       console.error('Error checking auth status:', err);
-      setError('Failed to check authentication status');
+      const message = err instanceof Error ? err.message : 'Failed to check authentication status';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -56,11 +68,12 @@ export default function ProfileTab() {
 
   const loadUserProfile = async () => {
     try {
-      const userProfile = await getCurrentUser();
+      const userProfile = await withTimeout(getCurrentUser());
       setUser(userProfile);
     } catch (err) {
       console.error('Error loading user profile:', err);
-      setError('Failed to load user profile');
+      const message = err instanceof Error ? err.message : 'Failed to load user profile';
+      setError(message);
     }
   };
 
