@@ -65,6 +65,15 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
+  // Fallback in case fonts never finish loading
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      console.log('Font load timeout - hiding splash screen');
+      SplashScreen.hideAsync().catch(() => {});
+    }, 7000);
+    return () => clearTimeout(timeout);
+  }, []);
+
   useEffect(() => {
     // Trigger intro animation after a delay
     const timer = setTimeout(() => {
